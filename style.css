@@ -1,0 +1,157 @@
+/* Стили для общего фона */
+body {
+  background-color: #ffffff;
+  color: #000000;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 25px;
+  margin: 0;
+  padding: 0;
+  position: relative; /* Чтобы кнопка саппорт могла позиционироваться относительно страницы */
+}
+
+/* Контейнер для центрирования */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+/* ======= КОНТЕЙНЕР ДЛЯ АВАТАРКИ И КНОПОК ======= */
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #000000; /* Обводка вокруг блока */
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1); /* Тень */
+  max-width: 400px; /* Ограничение ширины блока */
+  width: 100%; /* Ширина блока не будет превышать 100% от родителя */
+  margin: 0 auto; /* Центрирование блока по горизонтали */
+}
+
+/* ======= КОНТЕЙНЕР ДЛЯ АВАТАРКИ ======= */
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0px 5px 15px rgb(255, 255, 255);
+  transition: transform 2s ease; /* Добавляем анимацию для вращения */
+  width: 150px;
+  height: 150px;
+}
+
+.avatar-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0px 5px 15px rgb(0, 0, 0);
+  transition: transform 0.6s ease; /* Добавляем плавность вращения */
+}
+
+/* АНИМАЦИЯ ПРИ НАВЕДЕНИИ НА АВАТАРКУ */
+.avatar-container:hover img {
+  transform: rotate(360deg); /* Вращаем аватарку на 360 градусов */
+}
+
+/* ======= КНОПКИ ======= */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.buttons a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 20px;
+  font-family: "Press Start 2P", system-ui;
+  gap: 12px;
+  padding: 15px 30px;
+  background-color: transparent;
+  color: #000000;
+  text-decoration: none;
+  border-radius: 15px;
+  border: 3px solid #000000;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3); /* Тень для каждой кнопки */
+}
+
+/* АНИМАЦИЯ ПРИ НАВЕДЕНИИ */
+.buttons a:hover {
+  transform: scale(1.1); /* Увеличиваем кнопку при наведении */
+  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4); /* Увеличиваем тень при наведении */
+}
+
+/* Изображения внутри кнопок */
+.buttons img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 10px;
+  transition: opacity 1s ease;
+  opacity: 0;
+}
+
+/* АНИМАЦИЯ ПРИ НАВЕДЕНИИ (для изображений) */
+.buttons a:hover img {
+  opacity: 1; /* Изображение появляется при наведении */
+}
+
+/* АНИМАЦИЯ ПРИ НАЖАТИИ */
+.buttons a:active {
+  transform: translateY(5px); /* Кнопка уходит вниз */
+  transition: transform 0.3s ease-in-out;
+  box-shadow: none;
+}
+
+/* ======= КНОПКА САППОРТ В ПРАВОМ НИЖНЕМ УГЛУ ======= */
+.support-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 20px;
+  font-family: "Press Start 2P", system-ui;
+  padding: 15px 30px;
+  background-color: transparent;
+  color: #000000;
+  text-decoration: none;
+  border-radius: 15px;
+  border: none; /* Без обводки */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3); /* Тень для кнопки */
+}
+
+.support-button:hover {
+  transform: scale(1.1); /* Увеличиваем кнопку при наведении */
+  box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4); /* Увеличиваем тень при наведении */
+}
+
+.support-button:active {
+  transform: translateY(5px); /* Кнопка уходит вниз */
+  transition: transform 0.3s ease-in-out;
+  box-shadow: none;
+}
+
+
+
+
+
+
+
+
+
