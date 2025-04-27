@@ -280,36 +280,47 @@
   });
 
 // ====== Анимация тайтла "PepelOnMyOwn" ======
-  const titleText = "Pepel";
-  let displayText = ".";
+  const titleText = "Pepel"; // Текст для анимации
+  let displayText = "."; // Начинаем с точки
   let index = 0;
-  let isAdding = true;
+  let isAdding = true; // флаг для добавления или удаления текста
+  let interval; // переменная для хранения интервала, чтобы остановить его при необходимости
 
+  // Функция для обновления заголовка
   function updateTitle() {
     if (isAdding) {
       if (index < titleText.length) {
-        displayText += titleText[index];
+        displayText += titleText[index]; // Добавляем один символ
         index++;
       } else {
-        isAdding = false;
-        setTimeout(updateTitle, 1000); // подождать перед стиранием
+        isAdding = false; // Когда весь текст добавлен, начинаем стирать
+        setTimeout(updateTitle, 1000); // Подождать перед стиранием
         return;
       }
     } else {
       if (index > 0) {
-        displayText = displayText.slice(0, -1);
+        displayText = displayText.slice(0, -1); // Убираем последний символ
         index--;
       } else {
-        isAdding = true;
-        setTimeout(updateTitle, 1000); // подождать перед набором
+        isAdding = true; // Когда весь текст стерли, начинаем добавлять заново
+        setTimeout(updateTitle, 1000); // Подождать перед набором
         return;
       }
     }
-    document.title = displayText;
-    requestAnimationFrame(updateTitle); // использование requestAnimationFrame для более плавной анимации
+
+    document.title = displayText; // Обновляем заголовок
   }
 
-  window.addEventListener("load", updateTitle);
+  // Старт анимации при загрузке страницы
+  window.addEventListener("load", function() {
+    // Запускаем обновление заголовка с интервалом
+    interval = setInterval(updateTitle, 300); // Увеличьте задержку (например, 300 миллисекунд) для медленного набора/стирания
+  });
+
+  // Останавливаем анимацию при переходе на другую страницу
+  window.addEventListener("beforeunload", function() {
+    clearInterval(interval); // Останавливаем анимацию при покидании страницы
+  });
 </script>
 
 </body>
