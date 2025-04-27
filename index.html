@@ -254,12 +254,11 @@
 
   function createDrop() {
     return {
-      x: Math.random() * rainCanvas.width,
-      y: -Math.random() * 100,
-      size: Math.random() * 2 + 1,
-      speedY: Math.random() * 3 + 1,
-      drift: 0,
-      opacity: Math.random() * 0.5 + 0.3
+      x: Math.random() * rainCanvas.width,  // случайная позиция по X
+      y: -Math.random() * 100,  // начинаем сверху
+      size: Math.random() * 2 + 1,  // случайный размер
+      speedY: Math.random() * 3 + 1,  // скорость падения
+      opacity: Math.random() * 0.5 + 0.3  // случайная прозрачность
     };
   }
 
@@ -286,7 +285,6 @@
   let mouseX = 0;
   let mouseY = 0;
   let isHoveringButton = false;
-  let moveDirection = 0;  // 0 - не двигается, 1 - вправо, -1 - влево
 
   window.addEventListener('mousemove', (e) => {
     mouseX = e.x;
@@ -294,12 +292,6 @@
 
     const { deltaX, deltaY, speed } = calculateMouseSpeed(mouseX, mouseY);
     mouseSpeed = speed;
-
-    if (mouseX < window.innerWidth / 2) {
-      moveDirection = -1;  // Двигаемся влево
-    } else {
-      moveDirection = 1;  // Двигаемся вправо
-    }
   });
 
   // Обработчики событий для кнопок
@@ -319,22 +311,17 @@
     for (let drop of drops) {
       drop.opacity = Math.max(0.1, Math.min(1, 1 - (drop.y / rainCanvas.height)));
 
-      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05;
+      const speedFactor = isHoveringButton ? 0.1 : 1;  // Замедление при наведении на кнопку
 
-      // Изменяем поведение дождя при наведении на кнопку
-      if (isHoveringButton) {
-        drop.y += drop.speedY * 0.5; // Замедляем падение капель при наведении на кнопку
-        drop.x += moveDirection * 2;  // Разбегаются в одну сторону
-      } else {
-        drop.x += drop.drift * speedFactor;
-        drop.y += drop.speedY;
-      }
+      // Движение дождя вниз, при этом скорость капель замедляется при наведении
+      drop.y += drop.speedY * speedFactor;
 
       ctxRain.beginPath();
       ctxRain.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
       ctxRain.fillStyle = `rgba(80, 80, 80, ${drop.opacity})`;
       ctxRain.fill();
 
+      // Когда капля выходит за пределы экрана, создаём новую
       if (drop.y > rainCanvas.height) {
         Object.assign(drop, createDrop());
       }
@@ -350,6 +337,7 @@
     rainCanvas.height = window.innerHeight;
   });
 </script>
+
 
 
 </body>
