@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>.</title> <!-- Начальная точка для тайтла -->
+  <title>.</title>
   <link id="favicon" rel="icon" href="avatar.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +11,8 @@
   <audio id="background-music" src="music.mp3" loop></audio>
   <style>
     body {
-      background-color: #000000; /* Черный фон */
-      color: #ffffff; /* Белый текст */
+      background-color: #000000; 
+      color: #ffffff; 
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
@@ -47,7 +47,7 @@
       color: white;
     }
     .main-content {
-      display: none; /* Скрыто по умолчанию */
+      display: none;
     }
     .container {
       display: flex;
@@ -131,17 +131,15 @@
     .buttons a:hover img {
       opacity: 1;
     }
-    /* Стиль для канваса с дождем */
     .rainCanvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none;  /* Не будем мешать взаимодействию с кнопками */
+      pointer-events: none;
       z-index: 1;
     }
-
     .support-button {
       position: absolute;
       bottom: 20px;
@@ -166,13 +164,11 @@
 
 <body>
 
-<!-- ====== Предстраница ====== -->
 <div class="preloader" id="preloader">
   <h1>Добро пожаловать</h1>
   <button id="continue-button">Продолжить</button>
 </div>
 
-<!-- ====== Основной контент ====== -->
 <div class="main-content" id="main-content">
   <canvas id="rainCanvas" class="rainCanvas"></canvas>
 
@@ -201,7 +197,6 @@
 </div>
 
 <script>
-  // ========== Предзагрузка с кнопкой ========== 
   window.addEventListener("load", function () {
     const preloader = document.getElementById('preloader');
     const continueButton = document.getElementById('continue-button');
@@ -220,7 +215,6 @@
     });
   });
 
-  // ========== Анимация тайтла ========== 
   const titleBase = "Pepel";
   let titleIndex = 0;
   let isAdding = true;
@@ -251,7 +245,6 @@
     animateTitle();
   });
 
-  // ========== Дождик с изменением направления ========== 
   const rainCanvas = document.getElementById('rainCanvas');
   const ctxRain = rainCanvas.getContext('2d');
   rainCanvas.width = window.innerWidth;
@@ -262,11 +255,11 @@
   function createDrop() {
     return {
       x: Math.random() * rainCanvas.width,
-      y: -Math.random() * 100, // Начальная позиция чуть выше экрана
+      y: -Math.random() * 100,
       size: Math.random() * 2 + 1,
-      speedY: Math.random() * 3 + 1, // Скорость падения
-      drift: 0, // Начальная горизонтальная скорость
-      opacity: Math.random() * 0.5 + 0.3 // Полупрозрачные капли
+      speedY: Math.random() * 3 + 1,
+      drift: 0,
+      opacity: Math.random() * 0.5 + 0.3
     };
   }
 
@@ -278,12 +271,11 @@
   let lastMouseY = 0;
   let mouseSpeed = 0;
 
-  // Функция для вычисления скорости движения мыши
   function calculateMouseSpeed(x, y) {
     const deltaX = x - lastMouseX;
     const deltaY = y - lastMouseY;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    const speed = distance; // Простой расчет скорости
+    const speed = distance;
 
     lastMouseX = x;
     lastMouseY = y;
@@ -293,6 +285,7 @@
 
   let mouseX = 0;
   let mouseY = 0;
+  let isHoveringButton = false;
 
   window.addEventListener('mousemove', (e) => {
     mouseX = e.x;
@@ -300,36 +293,40 @@
 
     const { deltaX, deltaY, speed } = calculateMouseSpeed(mouseX, mouseY);
     mouseSpeed = speed;
+  });
 
-    // Запоминаем вектор направления
-    if (speed > 1) {
-      const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      drops.forEach(drop => {
-        drop.drift = deltaX / magnitude * 0.5; // Меняем горизонтальное движение капель
-      });
-    }
+  // Обработчики событий для кнопок
+  const buttons = document.querySelectorAll('.buttons a');
+  buttons.forEach(button => {
+    button.addEventListener('mouseenter', () => {
+      isHoveringButton = true;
+    });
+    button.addEventListener('mouseleave', () => {
+      isHoveringButton = false;
+    });
   });
 
   function drawRain() {
     ctxRain.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
 
     for (let drop of drops) {
-      // Уменьшаем прозрачность капли с увеличением высоты (чем выше, тем тусклее)
       drop.opacity = Math.max(0.1, Math.min(1, 1 - (drop.y / rainCanvas.height)));
 
-      // Если скорость мыши высокая, капли двигаются быстрее в направлении движения мыши
-      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05; // Если скорость мыши велика, ускоряем движение капель
+      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05;
 
-      // Двигаем капли вниз и в сторону движения мыши
-      drop.x += drop.drift * speedFactor;
-      drop.y += drop.speedY; // Падение вниз
+      if (isHoveringButton) {
+        drop.x += (Math.random() < 0.5 ? -1 : 1) * 5;
+      } else {
+        drop.x += drop.drift * speedFactor;
+      }
+
+      drop.y += drop.speedY;
 
       ctxRain.beginPath();
       ctxRain.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
       ctxRain.fillStyle = `rgba(80, 80, 80, ${drop.opacity})`;
       ctxRain.fill();
 
-      // Если капля выходит за пределы экрана, создаем её заново
       if (drop.y > rainCanvas.height) {
         Object.assign(drop, createDrop());
       }
@@ -348,6 +345,7 @@
 
 </body>
 </html>
+
 
 
 
