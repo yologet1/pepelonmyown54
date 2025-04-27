@@ -259,22 +259,31 @@
 
   const particles = [];
 
+  let mouseX = 0;
+  let mouseY = 0;
+
+  // Следим за позицией мыши
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.x;
+    mouseY = e.y;
+  });
+
   class Particle {
     constructor() {
-      this.x = Math.random() * pepperCanvas.width; // Начальная позиция по X случайная
-      this.y = pepperCanvas.height; // Начинает с нижней части экрана
+      this.x = Math.random() * pepperCanvas.width;
+      this.y = pepperCanvas.height;
       this.size = Math.random() * 5 + 2;
-      this.speedX = (Math.random() - 0.5) * 1.5; // Немного случайного движения по оси X
-      this.speedY = Math.random() * -3 - 1; // Увеличенная скорость для большего подъема частиц
-      this.targetX = mouseX; // Цель по оси X
-      this.targetY = mouseY; // Цель по оси Y
+      this.speedX = (Math.random() - 0.5) * 1.5;
+      this.speedY = Math.random() * -3 - 1;
+      this.targetX = mouseX;
+      this.targetY = mouseY;
       this.life = 100;
     }
 
     update() {
       // Двигаем частицы к цели (курсору)
       this.x += (this.targetX - this.x) * 0.02;
-      this.y += this.speedY; // Продолжаем движение вверх
+      this.y += this.speedY; // Поднимаем частицу вверх
       this.life -= 1;
     }
 
@@ -285,15 +294,6 @@
       ctxPepper.fill();
     }
   }
-
-  let mouseX = 0;
-  let mouseY = 0;
-
-  // Следим за позицией мыши
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.x;
-    mouseY = e.y;
-  });
 
   function animatePepper() {
     ctxPepper.clearRect(0, 0, pepperCanvas.width, pepperCanvas.height);
@@ -321,6 +321,7 @@
 
 </body>
 </html>
+
 
 
 
