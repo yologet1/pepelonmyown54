@@ -9,8 +9,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PepelOnMyOwn</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Press Start 2P', cursive;
+      color: white;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding-top: 50px;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .buttons a {
+      display: inline-block;
+      margin: 10px;
+      text-decoration: none;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .support-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: white;
+      text-decoration: none;
+    }
+    audio {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      z-index: 3;
+    }
+  </style>
 </head>
 <body>
+<canvas id="rain"></canvas>
+
 <div class="container">
   <div class="avatar-container">
     <img src="avatar.jpg" alt="Аватар">
@@ -21,23 +73,80 @@
       <img src="steam-Photoroom.png" alt="steam" width="20"> Steam
     </a>
     <a href="https://t.me/PepeIo_o" target="_blank">
-        <img src="tg2.png" alt="Telegram" > Telegram
+        <img src="tg2.png" alt="Telegram"> Telegram
     </a>
-    <a href="https://open.spotify.com/user/dizh64fisaifcx8dvm7bbix7m" target="_blank">
-      <img src="spotin.png" alt="Spoty"  > Spotify
+    <a href="https://open.spotify.com/user/dizh64fisaifcx8dvm7bbix7bbix7m" target="_blank">
+      <img src="spotin.png" alt="Spoty"> Spotify
     </a>
     <a href="https://www.instagram.com/pepelonmyown?igsh=MTBkNmZ6aHh3Mzh1aA==" target="_blank">
       <img src="insta1.png" alt="insta" width="20"> Instagram
     </a>
   </div>
 
-    <!-- Кнопка для связи -->
-    <a href="matvey@pepelonmyown.ru" class="support-button">support</a>
-
-
-
-    </div>
+  <a href="mailto:matvey@pepelonmyown.ru" class="support-button">support</a>
 </div>
-<script src="script.js"></script>
+
+<!-- Музыка -->
+<audio src="твоя_песня.mp3" autoplay loop controls></audio>
+
+<script>
+const canvas = document.getElementById('rain');
+const ctx = canvas.getContext('2d');
+
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+let raindrops = [];
+let mouseX = 0;
+let mouseY = 0;
+
+window.addEventListener('mousemove', function(e) {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+window.addEventListener('resize', function() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+});
+
+function createDrop() {
+  return {
+    x: Math.random() * width,
+    y: Math.random() * height,
+    speedY: Math.random() * 5 + 5,
+    speedX: (Math.random() - 0.5) * 2,
+    length: Math.random() * 15 + 10,
+  };
+}
+
+for (let i = 0; i < 300; i++) {
+  raindrops.push(createDrop());
+}
+
+function draw() {
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+  ctx.lineWidth = 1.5;
+
+  for (let drop of raindrops) {
+    ctx.beginPath();
+    ctx.moveTo(drop.x, drop.y);
+    ctx.lineTo(drop.x + drop.speedX * 2, drop.y + drop.length);
+    ctx.stroke();
+    
+    drop.x += (mouseX - width/2) * 0.0005 * drop.speedY;
+    drop.y += drop.speedY;
+
+    if (drop.y > height) {
+      drop.x = Math.random() * width;
+      drop.y = -20;
+    }
+  }
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
 </body>
 </html>
