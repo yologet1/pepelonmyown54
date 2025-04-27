@@ -1,3 +1,4 @@
+// Скрипт дождя
 const canvas = document.getElementById('rain');
 const ctx = canvas.getContext('2d');
 
@@ -8,19 +9,19 @@ let raindrops = [];
 let mouseX = 0;
 let mouseY = 0;
 
-// Отслеживаем движение мыши
+// Движение мыши
 window.addEventListener('mousemove', function(e) {
   mouseX = e.clientX;
   mouseY = e.clientY;
 });
 
-// При изменении размера окна
+// Адаптация под размер окна
 window.addEventListener('resize', function() {
   width = canvas.width = window.innerWidth;
   height = canvas.height = window.innerHeight;
 });
 
-// Создание капель
+// Создание капли
 function createDrop() {
   return {
     x: Math.random() * width,
@@ -39,7 +40,7 @@ for (let i = 0; i < 300; i++) {
 // Рисование дождя
 function draw() {
   ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'; // Чёрные капли
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
   ctx.lineWidth = 1.5;
 
   for (let drop of raindrops) {
@@ -47,12 +48,10 @@ function draw() {
     ctx.moveTo(drop.x, drop.y);
     ctx.lineTo(drop.x + drop.speedX * 2, drop.y + drop.length);
     ctx.stroke();
-    
-    // Движение капель в сторону мыши
+
     drop.x += (mouseX - width/2) * 0.0005 * drop.speedY;
     drop.y += drop.speedY;
 
-    // Перезапуск капель сверху
     if (drop.y > height) {
       drop.x = Math.random() * width;
       drop.y = -20;
@@ -63,6 +62,31 @@ function draw() {
 
 draw();
 
-// Запускаем музыку в фоне
+// Автозапуск музыки
 const music = document.getElementById('background-music');
-music.volume = 0.3; // Тише звук
+music.volume = 0.3;
+
+// Скрипт кнопок со спиннером
+document.addEventListener("DOMContentLoaded", function () {
+  const buttons = document.querySelectorAll(".buttons a");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", function (event) {
+      event.preventDefault(); // Останавливаем мгновенный переход
+
+      if (!this.classList.contains("loading")) {
+        this.classList.add("loading");
+
+        // Добавляем спиннер
+        let spinner = document.createElement("div");
+        spinner.classList.add("spinner");
+        this.appendChild(spinner);
+        spinner.style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = this.href; // Переход по ссылке после задержки
+        }, 1500);
+      }
+    });
+  });
+});
