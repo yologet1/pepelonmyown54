@@ -189,7 +189,6 @@
 
 
 <script>
-  // ===== Скрипт дождя =====
   const canvas = document.getElementById('rain');
   const ctx = canvas.getContext('2d');
 
@@ -214,9 +213,8 @@
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      speedY: Math.random() * 2 + 2, // 🐢 Медленный дождь (раньше было 5-10)
-      speedX: (Math.random() - 0.5) * 1, // чуть колебания по X
-      length: Math.random() * 10 + 5, // капли чуть меньше
+      speedY: Math.random() * 2 + 1, // еще медленнее
+      speedX: (Math.random() - 0.5) * 1,
     };
   }
 
@@ -226,22 +224,18 @@
 
   function draw() {
     ctx.clearRect(0, 0, width, height);
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.lineWidth = 1.2;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // цвет капель
 
     for (let drop of raindrops) {
-      ctx.beginPath();
-      ctx.moveTo(drop.x, drop.y);
-      ctx.lineTo(drop.x + drop.speedX * 2, drop.y + drop.length);
-      ctx.stroke();
+      ctx.fillRect(drop.x, drop.y, 2, 2); // маленький квадратик вместо линии
 
-      // Движение противоположно движению курсора
-      drop.x -= (mouseX - width/2) * 0.0003 * drop.speedY; // 🔥 минус вместо плюса
+      // противоположное движение мыши
+      drop.x -= (mouseX - width/2) * 0.0003 * drop.speedY;
       drop.y += drop.speedY;
 
       if (drop.y > height) {
         drop.x = Math.random() * width;
-        drop.y = -20;
+        drop.y = -10;
       }
     }
     requestAnimationFrame(draw);
@@ -281,7 +275,28 @@
       });
     });
   });
+
+  // ===== Анимация тайтла "PepelOnMyOwn" =====
+  const titleText = "PepelOnMyOwn";
+  let titleIndex = 0;
+  let titleDirection = 1; // 1 — добавляем буквы, -1 — убираем
+
+  setInterval(() => {
+    document.title = titleText.substring(0, titleIndex);
+
+    titleIndex += titleDirection;
+
+    if (titleIndex > titleText.length) {
+      titleDirection = -1;
+      titleIndex = titleText.length;
+    }
+    if (titleIndex < 0) {
+      titleDirection = 1;
+      titleIndex = 0;
+    }
+  }, 200); // скорость появления/исчезновения букв (можно изменить)
 </script>
+
 
 
 
