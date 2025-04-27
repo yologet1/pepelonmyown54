@@ -197,8 +197,8 @@
   let height = canvas.height = window.innerHeight;
 
   let raindrops = [];
-  let mouseX = 0;
-  let mouseY = 0;
+  let mouseX = width / 2;
+  let mouseY = height / 2;
 
   window.addEventListener('mousemove', function(e) {
     mouseX = e.clientX;
@@ -214,9 +214,9 @@
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      speedY: Math.random() * 5 + 5,
-      speedX: (Math.random() - 0.5) * 2,
-      length: Math.random() * 15 + 10,
+      speedY: Math.random() * 2 + 2, // 🐢 Медленный дождь (раньше было 5-10)
+      speedX: (Math.random() - 0.5) * 1, // чуть колебания по X
+      length: Math.random() * 10 + 5, // капли чуть меньше
     };
   }
 
@@ -227,7 +227,7 @@
   function draw() {
     ctx.clearRect(0, 0, width, height);
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.2;
 
     for (let drop of raindrops) {
       ctx.beginPath();
@@ -235,7 +235,8 @@
       ctx.lineTo(drop.x + drop.speedX * 2, drop.y + drop.length);
       ctx.stroke();
 
-      drop.x += (mouseX - width/2) * 0.0005 * drop.speedY;
+      // Движение противоположно движению курсора
+      drop.x -= (mouseX - width/2) * 0.0003 * drop.speedY; // 🔥 минус вместо плюса
       drop.y += drop.speedY;
 
       if (drop.y > height) {
@@ -251,11 +252,11 @@
   window.addEventListener("load", function () {
     const music = document.getElementById('background-music');
     if (music) {
-      music.muted = true; // сначала делаем mute
+      music.muted = true;
       music.volume = 0.3;
       music.play().then(() => {
         setTimeout(() => {
-          music.muted = false; // через 500мс убираем mute
+          music.muted = false;
         }, 500);
       }).catch((e) => {
         console.log("Ошибка автозапуска музыки:", e);
@@ -281,6 +282,7 @@
     });
   });
 </script>
+
 
 
 </body>
