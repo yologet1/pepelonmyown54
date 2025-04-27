@@ -268,7 +268,9 @@
       drift: (Math.random() - 0.5) * 0.5, // Дребезжание в стороны
       opacity: Math.random() * 0.4 + 0.2, // Начальная полупрозрачность
       targetX: Math.random() * pepperCanvas.width,
-      targetY: pepperCanvas.height + Math.random() * 100
+      targetY: pepperCanvas.height + Math.random() * 100,
+      directionX: 0,
+      directionY: 0
     };
   }
 
@@ -290,7 +292,7 @@
     lastMouseX = x;
     lastMouseY = y;
 
-    return speed;
+    return { deltaX, deltaY, speed };
   }
 
   let mouseX = 0;
@@ -300,7 +302,17 @@
     mouseX = e.x;
     mouseY = e.y;
 
-    mouseSpeed = calculateMouseSpeed(mouseX, mouseY);
+    const { deltaX, deltaY, speed } = calculateMouseSpeed(mouseX, mouseY);
+    mouseSpeed = speed;
+
+    // Запоминаем вектор направления
+    if (speed > 1) {
+      const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      ashes.forEach(ash => {
+        ash.directionX = deltaX / magnitude;
+        ash.directionY = deltaY / magnitude;
+      });
+    }
   });
 
   function drawAsh() {
@@ -310,15 +322,12 @@
       // Уменьшаем прозрачность с увеличением высоты (чем выше, тем тусклее)
       ash.opacity = Math.max(0.1, Math.min(1, 1 - (ash.y / pepperCanvas.height)));
 
-      // Если скорость мыши большая, частицы двигаются быстрее к курсору
-      const speedFactor = mouseSpeed > 5 ? 0.1 : 0.02; // Если скорость мыши велика, ускоряем движение частиц
+      // Если скорость мыши высокая, частицы двигаются быстрее в направлении движения мыши
+      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05; // Если скорость мыши велика, ускоряем движение частиц
 
-      ash.targetX = mouseX;
-      ash.targetY = mouseY;
-
-      // Частицы будут двигаться в сторону курсора с учетом их скорости
-      ash.x += (ash.targetX - ash.x) * speedFactor;
-      ash.y += ash.speedY; // Подъем вверх
+      // Двигаем пепел в направлении движения мыши
+      ash.x += ash.directionX * speedFactor;
+      ash.y += ash.directionY * speedFactor + ash.speedY; // Подъем вверх
       ash.x += ash.drift;
 
       ctxPepper.beginPath();
@@ -342,6 +351,7 @@
     pepperCanvas.height = window.innerHeight;
   });
 </script>
+
 
 
 
