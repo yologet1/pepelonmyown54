@@ -160,7 +160,6 @@
     }
   </style>
 </head>
-
 <body>
 
 <canvas id="rain"></canvas>
@@ -194,6 +193,7 @@
   // ====== Дождь ======
   const canvas = document.getElementById('rain');
   const ctx = canvas.getContext('2d');
+
   let width = canvas.width = window.innerWidth;
   let height = canvas.height = window.innerHeight;
 
@@ -216,6 +216,7 @@
       x: Math.random() * width,
       y: Math.random() * height,
       speedY: Math.random() * 2 + 1,
+      speedX: (Math.random() - 0.5) * 1,
     };
   }
 
@@ -225,11 +226,15 @@
 
   function draw() {
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // черные капли
+
     for (let drop of raindrops) {
-      ctx.fillRect(drop.x, drop.y, 2, 2);
-      drop.x -= (mouseX - width/2) * 0.0003 * drop.speedY;
+      ctx.fillRect(drop.x, drop.y, 2, 2); // пиксель-капля 2x2
+
+      // Движение противоположное мышке
+      drop.x -= (mouseX - width / 2) * 0.0003 * drop.speedY;
       drop.y += drop.speedY;
+
       if (drop.y > height) {
         drop.x = Math.random() * width;
         drop.y = -10;
@@ -254,6 +259,7 @@
       });
     }
 
+    // ====== Анимация кнопок ======
     const buttons = document.querySelectorAll(".buttons a");
     buttons.forEach(button => {
       button.addEventListener("click", function (event) {
@@ -272,21 +278,35 @@
     });
   });
 
-  // ====== Анимация тайтла ======
+  // ====== Анимация тайтла "PepelOnMyOwn" ======
   const titleFull = "PepelOnMyOwn";
   let titleIndex = 0;
   let titleText = "";
+  let isAdding = true;
 
   function animateTitle() {
-    if (titleIndex < titleFull.length) {
-      titleText += titleFull[titleIndex];
-      document.title = titleText;
-      titleIndex++;
+    if (isAdding) {
+      if (titleIndex < titleFull.length) {
+        titleText += titleFull[titleIndex];
+        document.title = titleText;
+        titleIndex++;
+      } else {
+        isAdding = false; // Переключаем на удаление
+        setTimeout(animateTitle, 1000); // Задержка перед удалением
+        return;
+      }
     } else {
-      titleText = "";
-      titleIndex = 0;
+      if (titleIndex > 0) {
+        titleText = titleText.slice(0, -1);
+        document.title = titleText;
+        titleIndex--;
+      } else {
+        isAdding = true; // Переключаем на добавление
+        setTimeout(animateTitle, 1000); // Задержка перед набором
+        return;
+      }
     }
-    setTimeout(animateTitle, 200);
+    setTimeout(animateTitle, 200); // Скорость набора/удаления
   }
 
   window.addEventListener("load", animateTitle);
@@ -294,5 +314,4 @@
 
 </body>
 </html>
-
 
