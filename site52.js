@@ -62,12 +62,24 @@ function draw() {
 
 draw();
 
-// Автозапуск музыки
-const music = document.getElementById('background-music');
-music.volume = 0.3;
-
-// Скрипт кнопок со спиннером
+// Скрипт кнопок со спиннером и запуск музыки
 document.addEventListener("DOMContentLoaded", function () {
+  const music = document.getElementById('background-music');
+
+  if (music) {
+    music.volume = 0.3;
+
+    // Попытка сразу запустить
+    music.play().catch((error) => {
+      console.log('Браузер требует взаимодействия для старта музыки.');
+      // Вешаем на первый клик
+      document.addEventListener('click', function once() {
+        music.play();
+        document.removeEventListener('click', once);
+      });
+    });
+  }
+
   const buttons = document.querySelectorAll(".buttons a");
 
   buttons.forEach(button => {
@@ -90,3 +102,4 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
