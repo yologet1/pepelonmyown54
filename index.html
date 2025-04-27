@@ -321,13 +321,14 @@
 
       const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05;
 
+      // Изменяем поведение дождя при наведении на кнопку
       if (isHoveringButton) {
-        drop.x += moveDirection * 5;  // Разбегаются в одну сторону
+        drop.y += drop.speedY * 0.5; // Замедляем падение капель при наведении на кнопку
+        drop.x += moveDirection * 2;  // Разбегаются в одну сторону
       } else {
         drop.x += drop.drift * speedFactor;
+        drop.y += drop.speedY;
       }
-
-      drop.y += drop.speedY;
 
       ctxRain.beginPath();
       ctxRain.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
@@ -349,6 +350,7 @@
     rainCanvas.height = window.innerHeight;
   });
 </script>
+
 
 </body>
 </html>
