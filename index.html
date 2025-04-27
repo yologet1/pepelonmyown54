@@ -245,25 +245,6 @@
   }
   draw();
 
-  // ====== Музыка ======
-  window.addEventListener('load', function () {
-    const music = document.getElementById('background-music');
-    
-    // Устанавливаем музыку в состояние mute (без звука) сразу при загрузке
-    music.muted = true;
-    
-    // Пытаемся запустить музыку
-    music.play().then(() => {
-      console.log('Музыка успешно запустилась с отложенной задержкой.');
-      setTimeout(() => {
-        // Через 500 мс выключаем mute, чтобы музыка зазвучала
-        music.muted = false;
-      }, 500); // Задержка в 500 мс
-    }).catch((error) => {
-      console.log('Ошибка автозапуска музыки:', error);
-    });
-  });
-
     // ====== Анимация кнопок ======
     const buttons = document.querySelectorAll(".buttons a");
     buttons.forEach(button => {
