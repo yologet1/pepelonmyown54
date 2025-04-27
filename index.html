@@ -41,16 +41,12 @@
       background: transparent;
       cursor: pointer;
       transition: 0.3s;
-    .heart-img {
+    .heart {
+      font-family: "Press Start 2P", system-ui;
+      font-size: 36px;
       display: block;
-      margin: 20px auto 30px;
-      width: 50px; /* Укажите нужный размер */
-      height: auto;
-      transition: transform 0.3s ease;
-    }
-
-    .heart-img:hover {
-      transform: scale(1.2);
+      margin-top: 20px;
+      color: #ff0000; /* Красный цвет для сердца */
     }
     .preloader button:hover {
       background: black;
@@ -187,7 +183,7 @@
       <img src="avatar.jpg" alt="Аватар">
     </div>
     <h1>PepelOnMyOwn</h1>
-    <img src="heart1.png" alt="Сердце" class="heart-img">
+    <span class="heart">🤍</span>
     <div class="buttons">
       <a href="https://steamcommunity.com/profiles/76561198801625473/" target="_blank">
         <img src="steam-Photoroom.png" alt="Steam"> Steam
