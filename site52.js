@@ -63,11 +63,25 @@ function draw() {
 draw();
 
 // Автозапуск музыки
-const music = document.getElementById('background-music');
-music.volume = 0.3;
-
-// Скрипт кнопок со спиннером
 document.addEventListener("DOMContentLoaded", function () {
+  const music = document.createElement('audio');
+  music.id = 'background-music';
+  music.autoplay = true;
+  music.loop = true;
+  music.volume = 0.3;
+
+  const source = document.createElement('source');
+  source.src = 'music.mp3'; // <-- сюда положи свой файл!
+  source.type = 'audio/mpeg';
+
+  music.appendChild(source);
+  document.body.appendChild(music);
+
+  music.play().catch((error) => {
+    console.log('Музыка не запустилась автоматически. Нужно кликнуть на страницу.');
+  });
+
+  // Скрипт кнопок со спиннером
   const buttons = document.querySelectorAll(".buttons a");
 
   buttons.forEach(button => {
@@ -90,4 +104,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
