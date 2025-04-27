@@ -8,9 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <audio id="background-music" loop>
-    <source src="music.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="background-music" src="music.mp3" autoplay loop></audio>
   <style>
     /* ===== СТИЛИ ===== */
     body {
@@ -249,18 +247,22 @@
   }
   draw();
 
-  document.addEventListener("DOMContentLoaded", function () {
+  // ====== Музыка без клика ======
+  window.addEventListener("load", function () {
     const music = document.getElementById('background-music');
     if (music) {
+      music.muted = true; // сначала делаем mute
       music.volume = 0.3;
-      music.play().catch(() => {
-        document.addEventListener('click', function once() {
-          music.play();
-          document.removeEventListener('click', once);
-        });
+      music.play().then(() => {
+        setTimeout(() => {
+          music.muted = false; // через 500мс убираем mute
+        }, 500);
+      }).catch((e) => {
+        console.log("Ошибка автозапуска музыки:", e);
       });
     }
 
+    // Кнопки
     const buttons = document.querySelectorAll(".buttons a");
     buttons.forEach(button => {
       button.addEventListener("click", function (event) {
@@ -279,6 +281,7 @@
     });
   });
 </script>
+
 
 </body>
 </html>
