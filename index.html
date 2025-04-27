@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>.</title> <!-- Начальная точка для тайтла -->
   <link id="favicon" rel="icon" href="avatar.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -184,11 +184,12 @@
     </a>
   </div>
 
-  <a href="gmailto:matvey66999966@gmail.com" class="support-button">support</a>
+  <a href="mailto:matvey@pepelonmyown.ru" class="support-button">support</a>
 </div>
 
 <script>
-  document.title = "";
+  // Начальная точка в тайтле
+  document.title = ".";
 
   // ====== Дождь ======
   const canvas = document.getElementById('rain');
@@ -279,37 +280,36 @@
   });
 
   // ====== Анимация тайтла "PepelOnMyOwn" ======
-  const titleFull = ".Pepel";
-  let titleIndex = 0;
-  let titleText = "";
+  const titleText = "Pepel";
+  let displayText = ".";
+  let index = 0;
   let isAdding = true;
 
-  function animateTitle() {
+  function updateTitle() {
     if (isAdding) {
-      if (titleIndex < titleFull.length) {
-        titleText += titleFull[titleIndex];
-        document.title = titleText;
-        titleIndex++;
+      if (index < titleText.length) {
+        displayText += titleText[index];
+        index++;
       } else {
-        isAdding = false; // Переключаем на удаление
-        setTimeout(animateTitle, 1000); // Задержка перед удалением
+        isAdding = false;
+        setTimeout(updateTitle, 1000); // подождать перед стиранием
         return;
       }
     } else {
-      if (titleIndex > 0) {
-        titleText = titleText.slice(0, -1);
-        document.title = titleText;
-        titleIndex--;
+      if (index > 0) {
+        displayText = displayText.slice(0, -1);
+        index--;
       } else {
-        isAdding = true; // Переключаем на добавление
-        setTimeout(animateTitle, 1000); // Задержка перед набором
+        isAdding = true;
+        setTimeout(updateTitle, 1000); // подождать перед набором
         return;
       }
     }
-    setTimeout(animateTitle, 200); // Скорость набора/удаления
+    document.title = displayText;
+    setTimeout(updateTitle, 200); // скорость набора/удаления
   }
 
-  window.addEventListener("load", animateTitle);
+  window.addEventListener("load", updateTitle);
 </script>
 
 </body>
