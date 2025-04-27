@@ -9,8 +9,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PepelOnMyOwn</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Добавил стили для спиннера */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid black;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Сделаем body белым (фон для дождя) */
+    body {
+      background-color: white;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Чтобы дождь был позади контента */
+    #rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* Чтобы мышь проходила сквозь canvas */
+      z-index: -1; /* На задний план */
+    }
+  </style>
 </head>
 <body>
+
+<!-- Канвас для дождя -->
+<canvas id="rain"></canvas>
+
 <div class="container">
   <div class="avatar-container">
     <img src="avatar.jpg" alt="Аватар">
@@ -21,23 +61,21 @@
       <img src="steam-Photoroom.png" alt="steam" width="20"> Steam
     </a>
     <a href="https://t.me/PepeIo_o" target="_blank">
-        <img src="tg2.png" alt="Telegram" > Telegram
+        <img src="tg2.png" alt="Telegram"> Telegram
     </a>
     <a href="https://open.spotify.com/user/dizh64fisaifcx8dvm7bbix7m" target="_blank">
-      <img src="spotin.png" alt="Spoty"  > Spotify
+      <img src="spotin.png" alt="Spoty"> Spotify
     </a>
     <a href="https://www.instagram.com/pepelonmyown?igsh=MTBkNmZ6aHh3Mzh1aA==" target="_blank">
       <img src="insta1.png" alt="insta" width="20"> Instagram
     </a>
   </div>
 
-    <!-- Кнопка для связи -->
-    <a href="matvey@pepelonmyown.ru" class="support-button">support</a>
-
-
-
-    </div>
+  <!-- Кнопка для связи -->
+  <a href="mailto:matvey@pepelonmyown.ru" class="support-button">support</a>
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
+
