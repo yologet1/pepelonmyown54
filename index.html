@@ -233,18 +233,18 @@
     if (isAdding) {
       if (titleIndex < titleBase.length) {
         titleIndex++;
-        setTimeout(animateTitle, 250);
+        setTimeout(animateTitle, 400); // медленнее набор
       } else {
         isAdding = false;
-        setTimeout(animateTitle, 1200); // пауза после полного написания
+        setTimeout(animateTitle, 1500); // пауза после полного слова
       }
     } else {
       if (titleIndex > 0) {
         titleIndex--;
-        setTimeout(animateTitle, 150);
+        setTimeout(animateTitle, 400); // медленнее стирание
       } else {
         isAdding = true;
-        setTimeout(animateTitle, 1000); // пауза после удаления
+        setTimeout(animateTitle, 1200); // пауза после стирания
       }
     }
   }
