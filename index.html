@@ -251,7 +251,7 @@
     animateTitle();
   });
 
-  // ========== Пепел, следящий за курсором ========== 
+  // ========== Пепел, который появляется снизу и медленно идет к курсору ========== 
   const pepperCanvas = document.getElementById('pepperCanvas');
   const ctxPepper = pepperCanvas.getContext('2d');
   pepperCanvas.width = window.innerWidth;
@@ -260,18 +260,21 @@
   const particles = [];
 
   class Particle {
-    constructor(x, y) {
-      this.x = x;
-      this.y = y;
+    constructor() {
+      this.x = Math.random() * pepperCanvas.width; // Начальная позиция по X случайная
+      this.y = pepperCanvas.height; // Начинает с нижней части экрана
       this.size = Math.random() * 5 + 2;
-      this.speedX = Math.random() * 3 - 1.5;
-      this.speedY = Math.random() * 3 - 1.5;
+      this.speedX = (Math.random() - 0.5) * 1.5; // Немного случайного движения по оси X
+      this.speedY = Math.random() * -1.5 - 1; // Частицы движутся вверх
+      this.targetX = mouseX; // Цель по оси X
+      this.targetY = mouseY; // Цель по оси Y
       this.life = 100;
     }
 
     update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
+      // Двигаем частицы к цели (курсору)
+      this.x += (this.targetX - this.x) * 0.05;
+      this.y += (this.targetY - this.y) * 0.05;
       this.life -= 1;
     }
 
@@ -283,21 +286,29 @@
     }
   }
 
+  let mouseX = 0;
+  let mouseY = 0;
+
+  // Следим за позицией мыши
   window.addEventListener('mousemove', (e) => {
-    const particleCount = 5; // Количество частиц
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle(e.x, e.y));
-    }
+    mouseX = e.x;
+    mouseY = e.y;
   });
 
   function animatePepper() {
     ctxPepper.clearRect(0, 0, pepperCanvas.width, pepperCanvas.height);
 
+    // Генерация частиц с интервалом
+    if (Math.random() < 0.1) {
+      particles.push(new Particle());
+    }
+
+    // Обновление и отрисовка частиц
     particles.forEach((particle, index) => {
       particle.update();
       particle.draw();
       if (particle.life <= 0) {
-        particles.splice(index, 1); // Убираем мертвые частицы
+        particles.splice(index, 1); // Убираем старые частицы
       }
     });
 
@@ -306,11 +317,9 @@
 
   // Запуск анимации
   animatePepper();
-
 </script>
 
 </body>
 </html>
-
 
 
