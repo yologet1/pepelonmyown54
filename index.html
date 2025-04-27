@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <audio id="background-music" src="music.mp3" loop></audio>
   <style>
-    /* Стили */
     body {
       background-color: #000000; /* Черный фон */
       color: #ffffff; /* Белый текст */
@@ -132,8 +131,8 @@
     .buttons a:hover img {
       opacity: 1;
     }
-    /* Стиль для канваса, который будет рисовать розочки */
-    .roseCanvas {
+    /* Стиль для канваса с пеплом */
+    .pepperCanvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -162,15 +161,6 @@
       transform: scale(1.1);
       box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
     }
-    #rain {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
   </style>
 </head>
 
@@ -184,8 +174,7 @@
 
 <!-- ====== Основной контент ====== -->
 <div class="main-content" id="main-content">
-  <canvas id="rain"></canvas>
-  <canvas id="roseCanvas" class="roseCanvas"></canvas>
+  <canvas id="pepperCanvas" class="pepperCanvas"></canvas>
 
   <div class="container">
     <div class="avatar-container">
@@ -262,66 +251,66 @@
     animateTitle();
   });
 
-  // ========== Рисование и анимация розочек ========== 
-  const roseCanvas = document.getElementById('roseCanvas');
-  const ctxRose = roseCanvas.getContext('2d');
-  roseCanvas.width = window.innerWidth;
-  roseCanvas.height = window.innerHeight;
+  // ========== Пепел, следящий за курсором ========== 
+  const pepperCanvas = document.getElementById('pepperCanvas');
+  const ctxPepper = pepperCanvas.getContext('2d');
+  pepperCanvas.width = window.innerWidth;
+  pepperCanvas.height = window.innerHeight;
 
-  function drawRose(x, y, size) {
-    ctxRose.save();
-    ctxRose.translate(x, y);
-    ctxRose.beginPath();
-    ctxRose.arc(0, 0, size, 0, Math.PI * 2); // Основной круг (центр)
-    ctxRose.fillStyle = 'white'; // Цвет лепестков
-    ctxRose.fill();
-    ctxRose.strokeStyle = 'white';
-    ctxRose.lineWidth = 2;
-  
-    // Рисуем лепестки
-    for (let i = 0; i < 5; i++) {
-      ctxRose.beginPath();
-      ctxRose.ellipse(0, -size, size / 2, size, Math.PI * i / 5, 0, Math.PI * 2);
-      ctxRose.fill();
+  const particles = [];
+
+  class Particle {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.size = Math.random() * 5 + 2;
+      this.speedX = Math.random() * 3 - 1.5;
+      this.speedY = Math.random() * 3 - 1.5;
+      this.life = 100;
     }
 
-    // Рисуем стебель (если нужно)
-    ctxRose.beginPath();
-    ctxRose.moveTo(0, size);
-    ctxRose.lineTo(0, size + 50);  // Стебель
-    ctxRose.stroke();
-    ctxRose.restore();
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life -= 1;
+    }
+
+    draw() {
+      ctxPepper.beginPath();
+      ctxPepper.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctxPepper.fillStyle = 'rgba(255, 255, 255, ' + this.life / 100 + ')';
+      ctxPepper.fill();
+    }
   }
 
-  function animateRoses() {
-    ctxRose.clearRect(0, 0, roseCanvas.width, roseCanvas.height);
-
-    let roseCount = 10;
-    let roseSpacing = 40;
-    let size = 10;
-
-    // Рисуем на левой стороне
-    for (let i = 0; i < roseCount; i++) {
-      drawRose(60, roseCanvas.height - i * roseSpacing - 50, size);
-      size += 3;
+  window.addEventListener('mousemove', (e) => {
+    const particleCount = 5; // Количество частиц
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle(e.x, e.y));
     }
+  });
 
-    // Рисуем на правой стороне
-    size = 10;
-    for (let i = 0; i < roseCount; i++) {
-      drawRose(roseCanvas.width - 60, roseCanvas.height - i * roseSpacing - 50, size);
-      size += 3;
-    }
+  function animatePepper() {
+    ctxPepper.clearRect(0, 0, pepperCanvas.width, pepperCanvas.height);
 
-    requestAnimationFrame(animateRoses);
+    particles.forEach((particle, index) => {
+      particle.update();
+      particle.draw();
+      if (particle.life <= 0) {
+        particles.splice(index, 1); // Убираем мертвые частицы
+      }
+    });
+
+    requestAnimationFrame(animatePepper);
   }
 
-  // Начинаем рисовать розочки
-  animateRoses();
+  // Запуск анимации
+  animatePepper();
 
 </script>
 
 </body>
 </html>
+
 
 
