@@ -201,80 +201,56 @@
 <script>
   // ========== Предзагрузка с кнопкой ==========
   window.addEventListener("load", function () {
-    const preloader = document.createElement('div');
-    preloader.id = "preloader";
-    preloader.style = `
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    `;
+    const preloader = document.getElementById('preloader');
+    const continueButton = document.getElementById('continue-button');
+    const mainContent = document.getElementById('main-content');
 
-    const btn = document.createElement('button');
-    btn.textContent = "Продолжить";
-    btn.style = `
-      padding: 20px 40px;
-      font-size: 24px;
-      border-radius: 15px;
-      background: black;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-family: 'Press Start 2P', system-ui;
-    `;
-
-    preloader.appendChild(btn);
-    document.body.appendChild(preloader);
-
-    btn.addEventListener("click", function () {
+    continueButton.addEventListener("click", function () {
       const music = document.getElementById('background-music');
       if (music) {
-        music.volume = 0.1; // сделаем музыку потише
+        music.volume = 0.1; // Сделаем музыку потише
         music.play().catch((e) => {
           console.log("Не удалось запустить музыку:", e);
         });
       }
-      preloader.remove(); // убираем предзагрузку
+
+      // Скрыть прелоадер и показать основной контент
+      preloader.style.display = "none";
+      mainContent.style.display = "block";
     });
   });
 
   // ========== Анимация тайтла ==========
-  const titleText = "Pepel"; // Текст для анимации
-  let displayText = "."; // Начинаем с точки
-  let index = 0;
-  let isAdding = true; // флаг добавления/стирания
+  const titleBase = "Pepel";
+  let titleIndex = 0;
+  let isAdding = true;
 
-  function updateTitle() {
+  function animateTitle() {
+    let currentTitle = "." + titleBase.slice(0, titleIndex);
+
+    document.title = currentTitle;
+
     if (isAdding) {
-      if (index < titleText.length) {
-        displayText += titleText[index];
-        index++;
-        document.title = displayText;
-        setTimeout(updateTitle, 250); // скорость набора
+      if (titleIndex < titleBase.length) {
+        titleIndex++;
+        setTimeout(animateTitle, 250);
       } else {
         isAdding = false;
-        setTimeout(updateTitle, 1200); // пауза после полного слова
+        setTimeout(animateTitle, 1200); // пауза после полного написания
       }
     } else {
-      if (index > 0) {
-        displayText = displayText.slice(0, -1);
-        index--;
-        document.title = displayText;
-        setTimeout(updateTitle, 150); // скорость стирания
+      if (titleIndex > 0) {
+        titleIndex--;
+        setTimeout(animateTitle, 150);
       } else {
         isAdding = true;
-        setTimeout(updateTitle, 1000); // пауза после удаления
+        setTimeout(animateTitle, 1000); // пауза после удаления
       }
     }
   }
 
   window.addEventListener("load", function() {
-    updateTitle();
+    animateTitle();
   });
 
   // ========== Анимация кнопок ==========
@@ -333,7 +309,7 @@
 
   function draw() {
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // черные капли
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
 
     for (let drop of raindrops) {
       ctx.fillRect(drop.x, drop.y, 2, 2);
@@ -350,8 +326,6 @@
   }
   draw();
 </script>
-
-
 </body>
 </html>
 
