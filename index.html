@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <audio id="background-music" src="music.mp3" autoplay loop></audio>
+  <audio id="background-music" src="music.mp3" loop></audio>
   <style>
     /* ===== СТИЛИ ===== */
     body {
@@ -246,19 +246,23 @@
   draw();
 
   // ====== Музыка ======
-  window.addEventListener("load", function () {
+  window.addEventListener('load', function () {
     const music = document.getElementById('background-music');
-    if (music) {
-      music.muted = true;
-      music.volume = 0.3;
-      music.play().then(() => {
-        setTimeout(() => {
-          music.muted = false;
-        }, 500);
-      }).catch((e) => {
-        console.log("Ошибка автозапуска музыки:", e);
-      });
-    }
+    
+    // Устанавливаем музыку в состояние mute (без звука) сразу при загрузке
+    music.muted = true;
+    
+    // Пытаемся запустить музыку
+    music.play().then(() => {
+      console.log('Музыка успешно запустилась с отложенной задержкой.');
+      setTimeout(() => {
+        // Через 500 мс выключаем mute, чтобы музыка зазвучала
+        music.muted = false;
+      }, 500); // Задержка в 500 мс
+    }).catch((error) => {
+      console.log('Ошибка автозапуска музыки:', error);
+    });
+  });
 
     // ====== Анимация кнопок ======
     const buttons = document.querySelectorAll(".buttons a");
