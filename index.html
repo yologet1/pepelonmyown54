@@ -199,7 +199,7 @@
 </div>
 
 <script>
-  // ========== Предзагрузка с кнопкой ==========
+  // ========== Предзагрузка с кнопкой ========== 
   window.addEventListener("load", function () {
     const preloader = document.getElementById('preloader');
     const continueButton = document.getElementById('continue-button');
@@ -208,52 +208,48 @@
     continueButton.addEventListener("click", function () {
       const music = document.getElementById('background-music');
       if (music) {
-        music.volume = 0.1; // Сделаем музыку потише
+        music.volume = 0.1;
         music.play().catch((e) => {
           console.log("Не удалось запустить музыку:", e);
         });
       }
-
-      // Скрыть прелоадер и показать основной контент
       preloader.style.display = "none";
       mainContent.style.display = "block";
     });
   });
 
-  // ========== Анимация тайтла ==========
+  // ========== Анимация тайтла ========== 
   const titleBase = "Pepel";
   let titleIndex = 0;
   let isAdding = true;
 
   function animateTitle() {
     let currentTitle = "." + titleBase.slice(0, titleIndex);
-
     document.title = currentTitle;
 
     if (isAdding) {
       if (titleIndex < titleBase.length) {
         titleIndex++;
-        setTimeout(animateTitle, 400); // медленнее набор
+        setTimeout(animateTitle, 400);
       } else {
         isAdding = false;
-        setTimeout(animateTitle, 1500); // пауза после полного слова
+        setTimeout(animateTitle, 1500);
       }
     } else {
       if (titleIndex > 0) {
         titleIndex--;
-        setTimeout(animateTitle, 400); // медленнее стирание
+        setTimeout(animateTitle, 400);
       } else {
         isAdding = true;
-        setTimeout(animateTitle, 1200); // пауза после стирания
+        setTimeout(animateTitle, 1200);
       }
     }
   }
-
   window.addEventListener("load", function() {
     animateTitle();
   });
 
-  // ========== Анимация кнопок ==========
+  // ========== Анимация кнопок ========== 
   window.addEventListener("load", function () {
     const buttons = document.querySelectorAll(".buttons a");
     buttons.forEach(button => {
@@ -273,58 +269,57 @@
     });
   });
 
-  // ========== Дождь ==========
+  // ========== Пепел вместо дождя ========== 
   const canvas = document.getElementById('rain');
   const ctx = canvas.getContext('2d');
 
   let width = canvas.width = window.innerWidth;
   let height = canvas.height = window.innerHeight;
 
-  let raindrops = [];
-  let mouseX = width / 2;
-  let mouseY = height / 2;
+  let ashes = [];
 
-  window.addEventListener('mousemove', function(e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
+  function createAsh() {
+    return {
+      x: Math.random() * width,
+      y: height + Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      speedY: Math.random() * -0.5 - 0.2, // Плавный подъем вверх
+      drift: (Math.random() - 0.5) * 0.5, // Дребезжание в стороны
+      opacity: Math.random() * 0.5 + 0.3 // Полупрозрачные
+    };
+  }
+
+  for (let i = 0; i < 200; i++) {
+    ashes.push(createAsh());
+  }
+
+  function drawAsh() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let ash of ashes) {
+      ctx.beginPath();
+      ctx.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(80, 80, 80, ${ash.opacity})`;
+      ctx.fill();
+
+      ash.y += ash.speedY;
+      ash.x += ash.drift;
+      ash.opacity -= 0.001;
+
+      if (ash.opacity <= 0 || ash.y < -10) {
+        Object.assign(ash, createAsh());
+      }
+    }
+
+    requestAnimationFrame(drawAsh);
+  }
+
+  drawAsh();
 
   window.addEventListener('resize', function() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   });
-
-  function createDrop() {
-    return {
-      x: Math.random() * width,
-      y: Math.random() * height,
-      speedY: Math.random() * 2 + 1,
-      speedX: (Math.random() - 0.5) * 1,
-    };
-  }
-
-  for (let i = 0; i < 300; i++) {
-    raindrops.push(createDrop());
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-
-    for (let drop of raindrops) {
-      ctx.fillRect(drop.x, drop.y, 2, 2);
-
-      drop.x -= (mouseX - width / 2) * 0.0003 * drop.speedY;
-      drop.y += drop.speedY;
-
-      if (drop.y > height) {
-        drop.x = Math.random() * width;
-        drop.y = -10;
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
 </script>
 </body>
 </html>
