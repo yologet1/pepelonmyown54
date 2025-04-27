@@ -8,7 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <button id="play-music" style="position:fixed;top:20px;left:20px;z-index:9999;padding:10px 20px;font-size:20px;">▶ Включить музыку</button>
+  <audio id="background-music" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
   <style>
     /* ===== СТИЛИ ===== */
     body {
@@ -186,12 +188,7 @@
 
   <a href="mailto:matvey@pepelonmyown.ru" class="support-button">support</a>
 </div>
-<button id="play-music" style="position:fixed;top:20px;left:20px;z-index:9999;padding:10px 20px;font-size:20px;">▶ Включить музыку</button>
 
-<audio id="background-music" loop>
-  <source src="music.mp3" type="audio/mpeg">
-  Ваш браузер не поддерживает аудио.
-</audio>
 
 <script>
   // ===== Скрипт дождя =====
