@@ -251,31 +251,27 @@
     animateTitle();
   });
 
-  // ========== Пепел вместо дождя ========== 
-  const pepperCanvas = document.getElementById('pepperCanvas');
-  const ctxPepper = pepperCanvas.getContext('2d');
-  pepperCanvas.width = window.innerWidth;
-  pepperCanvas.height = window.innerHeight;
+  // ========== Дождик с изменением направления ========== 
+  const rainCanvas = document.getElementById('rainCanvas');
+  const ctxRain = rainCanvas.getContext('2d');
+  rainCanvas.width = window.innerWidth;
+  rainCanvas.height = window.innerHeight;
 
-  let ashes = [];
+  let drops = [];
 
-  function createAsh() {
+  function createDrop() {
     return {
-      x: Math.random() * pepperCanvas.width,
-      y: pepperCanvas.height + Math.random() * 100, // Начальная позиция чуть ниже экрана
+      x: Math.random() * rainCanvas.width,
+      y: -Math.random() * 100, // Начальная позиция чуть выше экрана
       size: Math.random() * 2 + 1,
-      speedY: Math.random() * -0.4 - 0.2, // Плавный подъем вверх (медленный)
-      drift: (Math.random() - 0.5) * 0.5, // Дребезжание в стороны
-      opacity: Math.random() * 0.4 + 0.2, // Начальная полупрозрачность
-      targetX: Math.random() * pepperCanvas.width,
-      targetY: pepperCanvas.height + Math.random() * 100,
-      directionX: 0,
-      directionY: 0
+      speedY: Math.random() * 3 + 1, // Скорость падения
+      drift: 0, // Начальная горизонтальная скорость
+      opacity: Math.random() * 0.5 + 0.3 // Полупрозрачные капли
     };
   }
 
   for (let i = 0; i < 200; i++) {
-    ashes.push(createAsh());
+    drops.push(createDrop());
   }
 
   let lastMouseX = 0;
@@ -308,47 +304,45 @@
     // Запоминаем вектор направления
     if (speed > 1) {
       const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      ashes.forEach(ash => {
-        ash.directionX = deltaX / magnitude;
-        ash.directionY = deltaY / magnitude;
+      drops.forEach(drop => {
+        drop.drift = deltaX / magnitude * 0.5; // Меняем горизонтальное движение капель
       });
     }
   });
 
-  function drawAsh() {
-    ctxPepper.clearRect(0, 0, pepperCanvas.width, pepperCanvas.height);
+  function drawRain() {
+    ctxRain.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
 
-    for (let ash of ashes) {
-      // Уменьшаем прозрачность с увеличением высоты (чем выше, тем тусклее)
-      ash.opacity = Math.max(0.1, Math.min(1, 1 - (ash.y / pepperCanvas.height)));
+    for (let drop of drops) {
+      // Уменьшаем прозрачность капли с увеличением высоты (чем выше, тем тусклее)
+      drop.opacity = Math.max(0.1, Math.min(1, 1 - (drop.y / rainCanvas.height)));
 
-      // Если скорость мыши высокая, частицы двигаются быстрее в направлении движения мыши
-      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05; // Если скорость мыши велика, ускоряем движение частиц
+      // Если скорость мыши высокая, капли двигаются быстрее в направлении движения мыши
+      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05; // Если скорость мыши велика, ускоряем движение капель
 
-      // Двигаем пепел в направлении движения мыши
-      ash.x += ash.directionX * speedFactor;
-      ash.y += ash.directionY * speedFactor + ash.speedY; // Подъем вверх
-      ash.x += ash.drift;
+      // Двигаем капли вниз и в сторону движения мыши
+      drop.x += drop.drift * speedFactor;
+      drop.y += drop.speedY; // Падение вниз
 
-      ctxPepper.beginPath();
-      ctxPepper.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
-      ctxPepper.fillStyle = `rgba(80, 80, 80, ${ash.opacity})`;
-      ctxPepper.fill();
+      ctxRain.beginPath();
+      ctxRain.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
+      ctxRain.fillStyle = `rgba(80, 80, 80, ${drop.opacity})`;
+      ctxRain.fill();
 
-      // Если пепел выходит за пределы экрана, создаем его заново
-      if (ash.y < -10) {
-        Object.assign(ash, createAsh());
+      // Если капля выходит за пределы экрана, создаем её заново
+      if (drop.y > rainCanvas.height) {
+        Object.assign(drop, createDrop());
       }
     }
 
-    requestAnimationFrame(drawAsh);
+    requestAnimationFrame(drawRain);
   }
 
-  drawAsh();
+  drawRain();
 
   window.addEventListener('resize', function() {
-    pepperCanvas.width = window.innerWidth;
-    pepperCanvas.height = window.innerHeight;
+    rainCanvas.width = window.innerWidth;
+    rainCanvas.height = window.innerHeight;
   });
 </script>
 
