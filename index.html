@@ -286,6 +286,7 @@
   let mouseX = 0;
   let mouseY = 0;
   let isHoveringButton = false;
+  let moveDirection = 0;  // 0 - не двигается, 1 - вправо, -1 - влево
 
   window.addEventListener('mousemove', (e) => {
     mouseX = e.x;
@@ -293,6 +294,12 @@
 
     const { deltaX, deltaY, speed } = calculateMouseSpeed(mouseX, mouseY);
     mouseSpeed = speed;
+
+    if (mouseX < window.innerWidth / 2) {
+      moveDirection = -1;  // Двигаемся влево
+    } else {
+      moveDirection = 1;  // Двигаемся вправо
+    }
   });
 
   // Обработчики событий для кнопок
@@ -315,7 +322,7 @@
       const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05;
 
       if (isHoveringButton) {
-        drop.x += (Math.random() < 0.5 ? -1 : 1) * 5;
+        drop.x += moveDirection * 5;  // Разбегаются в одну сторону
       } else {
         drop.x += drop.drift * speedFactor;
       }
@@ -345,6 +352,7 @@
 
 </body>
 </html>
+
 
 
 
