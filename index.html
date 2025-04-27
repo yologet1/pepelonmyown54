@@ -132,6 +132,17 @@
     .buttons a:hover img {
       opacity: 1;
     }
+    /* Стиль для канваса, который будет рисовать розочки */
+    .roseCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;  /* Не будем мешать взаимодействию с кнопками */
+      z-index: 1;
+    }
+
     .support-button {
       position: absolute;
       bottom: 20px;
@@ -174,6 +185,7 @@
 <!-- ====== Основной контент ====== -->
 <div class="main-content" id="main-content">
   <canvas id="rain"></canvas>
+  <canvas id="roseCanvas" class="roseCanvas"></canvas>
 
   <div class="container">
     <div class="avatar-container">
@@ -269,7 +281,72 @@
       });
     });
   });
+  // Получаем доступ к канвасу и контексту рисования
+  const canvas = document.getElementById('roseCanvas');
+  const ctx = canvas.getContext('2d');
 
+  // Устанавливаем размер канваса
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Функция для рисования одной розочки
+  function drawRose(x, y, size) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.beginPath();
+    ctx.arc(0, 0, size, 0, Math.PI * 2); // Основной круг (центр)
+    ctx.fillStyle = 'white'; // Цвет лепестков
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2;
+  
+    // Рисуем лепестки
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.ellipse(0, -size, size / 2, size, Math.PI * i / 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Рисуем стебель (если нужно)
+    ctx.beginPath();
+    ctx.moveTo(0, size);
+    ctx.lineTo(0, size + 50);  // Стебель
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Функция для анимации розочек
+  function animateRoses() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем канвас
+
+    // Рисуем несколько розочек по бокам экрана
+    let roseCount = 10; // Количество розочек на одном боковом канале
+    let roseSpacing = 40; // Расстояние между розочками
+    let size = 10; // Начальный размер розочки
+
+    // Рисуем на левой стороне
+    for (let i = 0; i < roseCount; i++) {
+      drawRose(60, canvas.height - i * roseSpacing - 50, size);
+      size += 3; // Увеличиваем размер розочки
+    }
+
+    // Рисуем на правой стороне
+    size = 10;
+    for (let i = 0; i < roseCount; i++) {
+      drawRose(canvas.width - 60, canvas.height - i * roseSpacing - 50, size);
+      size += 3; // Увеличиваем размер розочки
+    }
+
+    requestAnimationFrame(animateRoses); // Запускаем анимацию
+  }
+
+  window.addEventListener('load', animateRoses); // Запускаем анимацию после загрузки страницы
+
+  // При изменении размера экрана обновляем размер канваса
+  window.addEventListener('resize', function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
   // ========== Пепел вместо дождя ========== 
   const canvas = document.getElementById('rain');
   const ctx = canvas.getContext('2d');
