@@ -214,7 +214,7 @@
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      speedY: Math.random() * 2 + 1, // медленнее падение
+      speedY: Math.random() * 2 + 1,
       speedX: (Math.random() - 0.5) * 1,
     };
   }
@@ -243,7 +243,7 @@
   }
   draw();
 
-  // ====== Музыка без клика ======
+  // ====== Музыка ======
   window.addEventListener("load", function () {
     const music = document.getElementById('background-music');
     if (music) {
@@ -252,7 +252,7 @@
       music.play().then(() => {
         setTimeout(() => {
           music.muted = false;
-        }, 500); // через полсекунды звук включается
+        }, 500);
       }).catch((e) => {
         console.log("Ошибка автозапуска музыки:", e);
       });
@@ -278,30 +278,38 @@
   });
 
   // ====== Анимация тайтла "PepelOnMyOwn" ======
-  const titleText = "Pepel";
-  let currentTitle = "";
-  let titleIndex = 0;
-  let adding = true;
+  const titleText = "PepelOnMyOwn";
+  let displayText = "";
+  let index = 0;
+  let isAdding = true;
 
-  setInterval(() => {
-    if (adding) {
-      currentTitle += titleText[titleIndex];
-      titleIndex++;
-      if (titleIndex === titleText.length) {
-        adding = false;
-        titleIndex = titleText.length - 1;
+  function updateTitle() {
+    if (isAdding) {
+      if (index < titleText.length) {
+        displayText += titleText[index];
+        index++;
+      } else {
+        isAdding = false;
+        setTimeout(updateTitle, 1000); // подождать перед стиранием
+        return;
       }
     } else {
-      currentTitle = currentTitle.slice(0, -1);
-      titleIndex--;
-      if (titleIndex < 0) {
-        adding = true;
-        titleIndex = 0;
+      if (index > 0) {
+        displayText = displayText.slice(0, -1);
+        index--;
+      } else {
+        isAdding = true;
+        setTimeout(updateTitle, 1000); // подождать перед набором
+        return;
       }
     }
-    document.title = currentTitle;
-  }, 300); // скорость печати/стирания
+    document.title = displayText;
+    setTimeout(updateTitle, 200); // скорость набора/удаления
+  }
+
+  window.addEventListener("load", updateTitle);
 </script>
+
 </body>
 </html>
 
