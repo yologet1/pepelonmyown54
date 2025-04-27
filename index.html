@@ -251,7 +251,7 @@
     animateTitle();
   });
 
-  // ========== Пепел, который появляется снизу и медленно идет к курсору ========== 
+  // ========== Пепел, который поднимается и стремится к курсору ========== 
   const pepperCanvas = document.getElementById('pepperCanvas');
   const ctxPepper = pepperCanvas.getContext('2d');
   pepperCanvas.width = window.innerWidth;
@@ -265,7 +265,7 @@
       this.y = pepperCanvas.height; // Начинает с нижней части экрана
       this.size = Math.random() * 5 + 2;
       this.speedX = (Math.random() - 0.5) * 1.5; // Немного случайного движения по оси X
-      this.speedY = Math.random() * -1.5 - 1; // Частицы движутся вверх
+      this.speedY = Math.random() * -2 - 1; // Частицы поднимаются вверх
       this.targetX = mouseX; // Цель по оси X
       this.targetY = mouseY; // Цель по оси Y
       this.life = 100;
@@ -273,8 +273,8 @@
 
     update() {
       // Двигаем частицы к цели (курсору)
-      this.x += (this.targetX - this.x) * 0.05;
-      this.y += (this.targetY - this.y) * 0.05;
+      this.x += (this.targetX - this.x) * 0.02;
+      this.y += this.speedY; // Продолжаем движение вверх
       this.life -= 1;
     }
 
@@ -321,5 +321,6 @@
 
 </body>
 </html>
+
 
 
