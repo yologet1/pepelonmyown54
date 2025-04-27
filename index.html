@@ -1,16 +1,140 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PepelOnMyOwn</title>
   <link id="favicon" rel="icon" href="avatar.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PepelOnMyOwn</title>
-  <link rel="stylesheet" href="style.css">
+
   <style>
-    /* Добавил стили для спиннера */
+    /* ===== СТИЛИ ===== */
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 25px;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #000;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .avatar-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0px 5px 15px rgb(255, 255, 255);
+      transition: transform 2s ease;
+      width: 150px;
+      height: 150px;
+    }
+    .avatar-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0px 5px 15px rgb(0, 0, 0);
+      transition: transform 0.6s ease;
+    }
+    .avatar-container:hover img {
+      transform: rotate(360deg);
+    }
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .buttons a {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      font-size: 20px;
+      font-family: "Press Start 2P", system-ui;
+      gap: 12px;
+      padding: 15px 30px;
+      background-color: transparent;
+      color: #000;
+      text-decoration: none;
+      border-radius: 15px;
+      border: 3px solid #000;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .buttons a:hover {
+      transform: scale(1.1);
+      box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+    }
+    .buttons img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin-right: 10px;
+      transition: opacity 1s ease;
+      opacity: 0;
+    }
+    .buttons a:hover img {
+      opacity: 1;
+    }
+    .buttons a:active {
+      transform: translateY(5px);
+      transition: transform 0.3s ease-in-out;
+      box-shadow: none;
+    }
+    .support-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 20px;
+      font-family: "Press Start 2P", system-ui;
+      padding: 15px 30px;
+      background-color: transparent;
+      color: #000;
+      text-decoration: none;
+      border-radius: 15px;
+      border: none;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .support-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+    }
+    .support-button:active {
+      transform: translateY(5px);
+      transition: transform 0.3s ease-in-out;
+      box-shadow: none;
+    }
     .spinner {
       width: 16px;
       height: 16px;
@@ -21,34 +145,23 @@
       animation: spin 0.8s linear infinite;
       margin-left: 10px;
     }
-    
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-
-    /* Сделаем body белым (фон для дождя) */
-    body {
-      background-color: white;
-      margin: 0;
-      overflow: hidden;
-    }
-
-    /* Чтобы дождь был позади контента */
     #rain {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none; /* Чтобы мышь проходила сквозь canvas */
-      z-index: -1; /* На задний план */
+      pointer-events: none;
+      z-index: -1;
     }
   </style>
 </head>
 <body>
 
-<!-- Канвас для дождя -->
 <canvas id="rain"></canvas>
 
 <div class="container">
@@ -58,27 +171,117 @@
   <h1>PepelOnMyOwn</h1>
   <div class="buttons">
     <a href="https://steamcommunity.com/profiles/76561198801625473/" target="_blank">
-      <img src="steam-Photoroom.png" alt="steam" width="20"> Steam
+      <img src="steam-Photoroom.png" alt="Steam"> Steam
     </a>
     <a href="https://t.me/PepeIo_o" target="_blank">
-        <img src="tg2.png" alt="Telegram"> Telegram
+      <img src="tg2.png" alt="Telegram"> Telegram
     </a>
     <a href="https://open.spotify.com/user/dizh64fisaifcx8dvm7bbix7m" target="_blank">
-      <img src="spotin.png" alt="Spoty"> Spotify
+      <img src="spotin.png" alt="Spotify"> Spotify
     </a>
     <a href="https://www.instagram.com/pepelonmyown?igsh=MTBkNmZ6aHh3Mzh1aA==" target="_blank">
-      <img src="insta1.png" alt="insta" width="20"> Instagram
+      <img src="insta1.png" alt="Instagram"> Instagram
     </a>
   </div>
 
-  <!-- Кнопка для связи -->
   <a href="mailto:matvey@pepelonmyown.ru" class="support-button">support</a>
 </div>
+
 <audio id="background-music" loop>
   <source src="music.mp3" type="audio/mpeg">
   Ваш браузер не поддерживает аудио.
 </audio>
-<script src="script.js"></script>
+
+<script>
+  // ===== Скрипт дождя =====
+  const canvas = document.getElementById('rain');
+  const ctx = canvas.getContext('2d');
+
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  let raindrops = [];
+  let mouseX = 0;
+  let mouseY = 0;
+
+  window.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  window.addEventListener('resize', function() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  function createDrop() {
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      speedY: Math.random() * 5 + 5,
+      speedX: (Math.random() - 0.5) * 2,
+      length: Math.random() * 15 + 10,
+    };
+  }
+
+  for (let i = 0; i < 300; i++) {
+    raindrops.push(createDrop());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.lineWidth = 1.5;
+
+    for (let drop of raindrops) {
+      ctx.beginPath();
+      ctx.moveTo(drop.x, drop.y);
+      ctx.lineTo(drop.x + drop.speedX * 2, drop.y + drop.length);
+      ctx.stroke();
+
+      drop.x += (mouseX - width/2) * 0.0005 * drop.speedY;
+      drop.y += drop.speedY;
+
+      if (drop.y > height) {
+        drop.x = Math.random() * width;
+        drop.y = -20;
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const music = document.getElementById('background-music');
+    if (music) {
+      music.volume = 0.3;
+      music.play().catch(() => {
+        document.addEventListener('click', function once() {
+          music.play();
+          document.removeEventListener('click', once);
+        });
+      });
+    }
+
+    const buttons = document.querySelectorAll(".buttons a");
+    buttons.forEach(button => {
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        if (!this.classList.contains("loading")) {
+          this.classList.add("loading");
+          let spinner = document.createElement("div");
+          spinner.classList.add("spinner");
+          this.appendChild(spinner);
+          spinner.style.display = "block";
+          setTimeout(() => {
+            window.location.href = this.href;
+          }, 1500);
+        }
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
 
