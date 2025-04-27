@@ -286,7 +286,6 @@
   let mouseX = 0;
   let mouseY = 0;
   let isHoveringButton = false;
-  let moveDirection = 0;  // 0 - не двигается, 1 - вправо, -1 - влево
 
   window.addEventListener('mousemove', (e) => {
     mouseX = e.x;
@@ -294,12 +293,6 @@
 
     const { deltaX, deltaY, speed } = calculateMouseSpeed(mouseX, mouseY);
     mouseSpeed = speed;
-
-    if (mouseX < window.innerWidth / 2) {
-      moveDirection = -1;  // Двигаемся влево
-    } else {
-      moveDirection = 1;  // Двигаемся вправо
-    }
   });
 
   // Обработчики событий для кнопок
@@ -319,12 +312,10 @@
     for (let drop of drops) {
       drop.opacity = Math.max(0.1, Math.min(1, 1 - (drop.y / rainCanvas.height)));
 
-      const speedFactor = mouseSpeed > 5 ? 0.3 : 0.05;
-
       if (isHoveringButton) {
-        drop.x += moveDirection * 5;  // Разбегаются в одну сторону
+        drop.speedY = 0;  // Замораживаем движение капель
       } else {
-        drop.x += drop.drift * speedFactor;
+        drop.speedY = Math.random() * 3 + 1;  // Восстанавливаем движение капель
       }
 
       drop.y += drop.speedY;
@@ -352,6 +343,7 @@
 
 </body>
 </html>
+
 
 
 
