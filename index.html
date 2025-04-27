@@ -189,6 +189,7 @@
 
 
 <script>
+  // ====== Дождь ======
   const canvas = document.getElementById('rain');
   const ctx = canvas.getContext('2d');
 
@@ -213,7 +214,7 @@
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      speedY: Math.random() * 2 + 1, // еще медленнее
+      speedY: Math.random() * 2 + 1, // медленнее падение
       speedX: (Math.random() - 0.5) * 1,
     };
   }
@@ -224,13 +225,13 @@
 
   function draw() {
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // цвет капель
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // черные капли
 
     for (let drop of raindrops) {
-      ctx.fillRect(drop.x, drop.y, 2, 2); // маленький квадратик вместо линии
+      ctx.fillRect(drop.x, drop.y, 2, 2); // пиксель-капля 2x2
 
-      // противоположное движение мыши
-      drop.x -= (mouseX - width/2) * 0.0003 * drop.speedY;
+      // Движение противоположное мышке
+      drop.x -= (mouseX - width / 2) * 0.0003 * drop.speedY;
       drop.y += drop.speedY;
 
       if (drop.y > height) {
@@ -251,13 +252,13 @@
       music.play().then(() => {
         setTimeout(() => {
           music.muted = false;
-        }, 500);
+        }, 500); // через полсекунды звук включается
       }).catch((e) => {
         console.log("Ошибка автозапуска музыки:", e);
       });
     }
 
-    // Кнопки
+    // ====== Анимация кнопок ======
     const buttons = document.querySelectorAll(".buttons a");
     buttons.forEach(button => {
       button.addEventListener("click", function (event) {
@@ -276,30 +277,31 @@
     });
   });
 
-  // ===== Анимация тайтла "PepelOnMyOwn" =====
+  // ====== Анимация тайтла "PepelOnMyOwn" ======
   const titleText = "PepelOnMyOwn";
+  let currentTitle = "";
   let titleIndex = 0;
-  let titleDirection = 1; // 1 — добавляем буквы, -1 — убираем
+  let adding = true;
 
   setInterval(() => {
-    document.title = titleText.substring(0, titleIndex);
-
-    titleIndex += titleDirection;
-
-    if (titleIndex > titleText.length) {
-      titleDirection = -1;
-      titleIndex = titleText.length;
+    if (adding) {
+      currentTitle += titleText[titleIndex];
+      titleIndex++;
+      if (titleIndex === titleText.length) {
+        adding = false;
+        titleIndex = titleText.length - 1;
+      }
+    } else {
+      currentTitle = currentTitle.slice(0, -1);
+      titleIndex--;
+      if (titleIndex < 0) {
+        adding = true;
+        titleIndex = 0;
+      }
     }
-    if (titleIndex < 0) {
-      titleDirection = 1;
-      titleIndex = 0;
-    }
-  }, 200); // скорость появления/исчезновения букв (можно изменить)
+    document.title = currentTitle;
+  }, 200); // скорость печати/стирания
 </script>
-
-
-
-
 </body>
 </html>
 
