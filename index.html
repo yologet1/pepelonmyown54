@@ -9,54 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PepelOnMyOwn</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #fff; /* Белый фон */
-      font-family: 'Press Start 2P', cursive;
-      color: black;
-    }
-    .container {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding-top: 50px;
-    }
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      pointer-events: none;
-    }
-    .buttons a {
-      display: inline-block;
-      margin: 10px;
-      text-decoration: none;
-      color: black;
-      background: rgba(0, 0, 0, 0.05);
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-    .support-button {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-      color: black;
-      text-decoration: none;
-    }
-  </style>
 </head>
 <body>
-<canvas id="rain"></canvas>
-
 <div class="container">
   <div class="avatar-container">
     <img src="avatar.jpg" alt="Аватар">
@@ -67,24 +21,23 @@
       <img src="steam-Photoroom.png" alt="steam" width="20"> Steam
     </a>
     <a href="https://t.me/PepeIo_o" target="_blank">
-        <img src="tg2.png" alt="Telegram"> Telegram
+        <img src="tg2.png" alt="Telegram" > Telegram
     </a>
     <a href="https://open.spotify.com/user/dizh64fisaifcx8dvm7bbix7m" target="_blank">
-      <img src="spotin.png" alt="Spotify"> Spotify
+      <img src="spotin.png" alt="Spoty"  > Spotify
     </a>
     <a href="https://www.instagram.com/pepelonmyown?igsh=MTBkNmZ6aHh3Mzh1aA==" target="_blank">
-      <img src="insta1.png" alt="Instagram" width="20"> Instagram
+      <img src="insta1.png" alt="insta" width="20"> Instagram
     </a>
   </div>
 
-  <a href="mailto:matvey@pepelonmyown.ru" class="support-button">support</a>
+    <!-- Кнопка для связи -->
+    <a href="matvey@pepelonmyown.ru" class="support-button">support</a>
+
+
+
+    </div>
 </div>
-
-<!-- Музыка без проигрывателя -->
-<audio id="background-music" src="твоя_песня.mp3" autoplay loop hidden></audio>
-
-<!-- Подключение скрипта -->
 <script src="script.js"></script>
 </body>
 </html>
-
