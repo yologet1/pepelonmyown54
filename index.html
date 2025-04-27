@@ -262,11 +262,11 @@
   function createAsh() {
     return {
       x: Math.random() * pepperCanvas.width,
-      y: pepperCanvas.height + Math.random() * 100,
+      y: pepperCanvas.height + Math.random() * 100, // Начальная позиция чуть ниже экрана
       size: Math.random() * 2 + 1,
-      speedY: Math.random() * -0.5 - 0.2, // Плавный подъем вверх
+      speedY: Math.random() * -0.4 - 0.2, // Плавный подъем вверх (медленный)
       drift: (Math.random() - 0.5) * 0.5, // Дребезжание в стороны
-      opacity: Math.random() * 0.5 + 0.3 // Полупрозрачные
+      opacity: Math.random() * 0.4 + 0.2 // Начальная полупрозрачность
     };
   }
 
@@ -278,16 +278,19 @@
     ctxPepper.clearRect(0, 0, pepperCanvas.width, pepperCanvas.height);
 
     for (let ash of ashes) {
+      // Уменьшаем прозрачность с увеличением высоты (чем выше, тем тусклее)
+      ash.opacity = Math.max(0.1, Math.min(1, 1 - (ash.y / pepperCanvas.height)));
+
       ctxPepper.beginPath();
       ctxPepper.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
       ctxPepper.fillStyle = `rgba(80, 80, 80, ${ash.opacity})`;
       ctxPepper.fill();
 
-      ash.y += ash.speedY;
+      ash.y += ash.speedY; // Подъем вверх
       ash.x += ash.drift;
-      ash.opacity -= 0.001;
 
-      if (ash.opacity <= 0 || ash.y < -10) {
+      // Если пепел выходит за пределы экрана, создаем его заново
+      if (ash.y < -10) {
         Object.assign(ash, createAsh());
       }
     }
@@ -302,6 +305,7 @@
     pepperCanvas.height = window.innerHeight;
   });
 </script>
+
 
 </body>
 </html>
