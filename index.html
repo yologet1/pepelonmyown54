@@ -262,143 +262,66 @@
     animateTitle();
   });
 
-  // ========== Анимация кнопок ========== 
-  window.addEventListener("load", function () {
-    const buttons = document.querySelectorAll(".buttons a");
-    buttons.forEach(button => {
-      button.addEventListener("click", function (event) {
-        event.preventDefault();
-        if (!this.classList.contains("loading")) {
-          this.classList.add("loading");
-          const spinner = document.createElement("div");
-          spinner.classList.add("spinner");
-          this.appendChild(spinner);
-          spinner.style.display = "block";
-          setTimeout(() => {
-            window.location.href = this.href;
-          }, 1500);
-        }
-      });
-    });
-  });
-  // Получаем доступ к канвасу и контексту рисования
-  const canvas = document.getElementById('roseCanvas');
-  const ctx = canvas.getContext('2d');
+  // ========== Рисование и анимация розочек ========== 
+  const roseCanvas = document.getElementById('roseCanvas');
+  const ctxRose = roseCanvas.getContext('2d');
+  roseCanvas.width = window.innerWidth;
+  roseCanvas.height = window.innerHeight;
 
-  // Устанавливаем размер канваса
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  // Функция для рисования одной розочки
   function drawRose(x, y, size) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.beginPath();
-    ctx.arc(0, 0, size, 0, Math.PI * 2); // Основной круг (центр)
-    ctx.fillStyle = 'white'; // Цвет лепестков
-    ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
+    ctxRose.save();
+    ctxRose.translate(x, y);
+    ctxRose.beginPath();
+    ctxRose.arc(0, 0, size, 0, Math.PI * 2); // Основной круг (центр)
+    ctxRose.fillStyle = 'white'; // Цвет лепестков
+    ctxRose.fill();
+    ctxRose.strokeStyle = 'white';
+    ctxRose.lineWidth = 2;
   
     // Рисуем лепестки
     for (let i = 0; i < 5; i++) {
-      ctx.beginPath();
-      ctx.ellipse(0, -size, size / 2, size, Math.PI * i / 5, 0, Math.PI * 2);
-      ctx.fill();
+      ctxRose.beginPath();
+      ctxRose.ellipse(0, -size, size / 2, size, Math.PI * i / 5, 0, Math.PI * 2);
+      ctxRose.fill();
     }
 
     // Рисуем стебель (если нужно)
-    ctx.beginPath();
-    ctx.moveTo(0, size);
-    ctx.lineTo(0, size + 50);  // Стебель
-    ctx.stroke();
-    ctx.restore();
+    ctxRose.beginPath();
+    ctxRose.moveTo(0, size);
+    ctxRose.lineTo(0, size + 50);  // Стебель
+    ctxRose.stroke();
+    ctxRose.restore();
   }
 
-  // Функция для анимации розочек
   function animateRoses() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем канвас
+    ctxRose.clearRect(0, 0, roseCanvas.width, roseCanvas.height);
 
-    // Рисуем несколько розочек по бокам экрана
-    let roseCount = 10; // Количество розочек на одном боковом канале
-    let roseSpacing = 40; // Расстояние между розочками
-    let size = 10; // Начальный размер розочки
+    let roseCount = 10;
+    let roseSpacing = 40;
+    let size = 10;
 
     // Рисуем на левой стороне
     for (let i = 0; i < roseCount; i++) {
-      drawRose(60, canvas.height - i * roseSpacing - 50, size);
-      size += 3; // Увеличиваем размер розочки
+      drawRose(60, roseCanvas.height - i * roseSpacing - 50, size);
+      size += 3;
     }
 
     // Рисуем на правой стороне
     size = 10;
     for (let i = 0; i < roseCount; i++) {
-      drawRose(canvas.width - 60, canvas.height - i * roseSpacing - 50, size);
-      size += 3; // Увеличиваем размер розочки
+      drawRose(roseCanvas.width - 60, roseCanvas.height - i * roseSpacing - 50, size);
+      size += 3;
     }
 
-    requestAnimationFrame(animateRoses); // Запускаем анимацию
+    requestAnimationFrame(animateRoses);
   }
 
-  window.addEventListener('load', animateRoses); // Запускаем анимацию после загрузки страницы
+  // Начинаем рисовать розочки
+  animateRoses();
 
-  // При изменении размера экрана обновляем размер канваса
-  window.addEventListener('resize', function() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  });
-  // ========== Пепел вместо дождя ========== 
-  const canvas = document.getElementById('rain');
-  const ctx = canvas.getContext('2d');
-
-  let width = canvas.width = window.innerWidth;
-  let height = canvas.height = window.innerHeight;
-
-  let ashes = [];
-
-  function createAsh() {
-    return {
-      x: Math.random() * width,
-      y: height + Math.random() * 100,
-      size: Math.random() * 2 + 1,
-      speedY: Math.random() * -0.5 - 0.2, // Плавный подъем вверх
-      drift: (Math.random() - 0.5) * 0.5, // Дребезжание в стороны
-      opacity: Math.random() * 0.5 + 0.3 // Полупрозрачные
-    };
-  }
-
-  for (let i = 0; i < 200; i++) {
-    ashes.push(createAsh());
-  }
-
-  function drawAsh() {
-    ctx.clearRect(0, 0, width, height);
-
-    for (let ash of ashes) {
-      ctx.beginPath();
-      ctx.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(200, 200, 200, ${ash.opacity})`; // Сделал пепел светло-серым
-      ctx.fill();
-
-      ash.y += ash.speedY;
-      ash.x += ash.drift;
-      ash.opacity -= 0.001;
-
-      if (ash.opacity <= 0 || ash.y < -10) {
-        Object.assign(ash, createAsh());
-      }
-    }
-
-    requestAnimationFrame(drawAsh);
-  }
-
-  drawAsh();
-
-  window.addEventListener('resize', function() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  });
 </script>
+
 </body>
 </html>
+
 
