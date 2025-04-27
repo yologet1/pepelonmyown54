@@ -266,13 +266,42 @@
       size: Math.random() * 2 + 1,
       speedY: Math.random() * -0.4 - 0.2, // Плавный подъем вверх (медленный)
       drift: (Math.random() - 0.5) * 0.5, // Дребезжание в стороны
-      opacity: Math.random() * 0.4 + 0.2 // Начальная полупрозрачность
+      opacity: Math.random() * 0.4 + 0.2, // Начальная полупрозрачность
+      targetX: Math.random() * pepperCanvas.width,
+      targetY: pepperCanvas.height + Math.random() * 100
     };
   }
 
   for (let i = 0; i < 200; i++) {
     ashes.push(createAsh());
   }
+
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+  let mouseSpeed = 0;
+
+  // Функция для вычисления скорости движения мыши
+  function calculateMouseSpeed(x, y) {
+    const deltaX = x - lastMouseX;
+    const deltaY = y - lastMouseY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const speed = distance; // Простой расчет скорости
+
+    lastMouseX = x;
+    lastMouseY = y;
+
+    return speed;
+  }
+
+  let mouseX = 0;
+  let mouseY = 0;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.x;
+    mouseY = e.y;
+
+    mouseSpeed = calculateMouseSpeed(mouseX, mouseY);
+  });
 
   function drawAsh() {
     ctxPepper.clearRect(0, 0, pepperCanvas.width, pepperCanvas.height);
@@ -281,13 +310,21 @@
       // Уменьшаем прозрачность с увеличением высоты (чем выше, тем тусклее)
       ash.opacity = Math.max(0.1, Math.min(1, 1 - (ash.y / pepperCanvas.height)));
 
+      // Если скорость мыши большая, частицы двигаются быстрее к курсору
+      const speedFactor = mouseSpeed > 5 ? 0.1 : 0.02; // Если скорость мыши велика, ускоряем движение частиц
+
+      ash.targetX = mouseX;
+      ash.targetY = mouseY;
+
+      // Частицы будут двигаться в сторону курсора с учетом их скорости
+      ash.x += (ash.targetX - ash.x) * speedFactor;
+      ash.y += ash.speedY; // Подъем вверх
+      ash.x += ash.drift;
+
       ctxPepper.beginPath();
       ctxPepper.arc(ash.x, ash.y, ash.size, 0, Math.PI * 2);
       ctxPepper.fillStyle = `rgba(80, 80, 80, ${ash.opacity})`;
       ctxPepper.fill();
-
-      ash.y += ash.speedY; // Подъем вверх
-      ash.x += ash.drift;
 
       // Если пепел выходит за пределы экрана, создаем его заново
       if (ash.y < -10) {
@@ -305,6 +342,7 @@
     pepperCanvas.height = window.innerHeight;
   });
 </script>
+
 
 
 </body>
