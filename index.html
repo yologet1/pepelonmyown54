@@ -297,7 +297,7 @@
     continueButton.addEventListener("click", function () {
       const music = document.getElementById('background-music');
       if (music) {
-        music.volume = 0.01;
+        music.volume = 0.005;
         music.play().catch((e) => {
           console.log("Не удалось запустить музыку:", e);
         });
