@@ -154,7 +154,7 @@
     z-index: 1;
   }
   .support-button {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     right: 20px;
     font-size: 20px;
@@ -165,16 +165,45 @@
     text-decoration: none;
     border-radius: 15px;
     border: 3px solid #ffffff;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, width 0.3s, height 0.3s, border-radius 0.3s;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 10;
   }
+
   .support-button:hover {
     transform: scale(1.1);
     box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
   }
 
+  .button-text {
+    display: inline-block;
+  }
+
+  .button-icon {
+    display: none;
+    font-size: 24px;
+  }
+
   /* 📱 АДАПТАЦИЯ ДЛЯ МОБИЛОК */
   @media (max-width: 600px) {
+    .support-button {
+      width: 60px;
+      height: 60px;
+      padding: 0;
+      border-radius: 50%;
+    }
+
+    .button-text {
+      display: none;
+    }
+
+    .button-icon {
+      display: inline-block;
+    }
     .preloader h1 {
       font-size: 16px;
       margin-bottom: 20px;
@@ -251,7 +280,10 @@
         <img src="insta1.png" alt="Instagram"> Instagram
       </a>
     </div>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vandalwaw1@gmail.com&su=Вопрос%20по%20каналу&body=Здравствуйте,%20у%20меня%20вопрос...%0A%0A" class="support-button">question me</a>
+    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vandalwaw1@gmail.com&su=Вопрос%20по%20каналу&body=Здравствуйте,%20у%20меня%20вопрос...%0A%0A" class="support-button">
+      <span class="button-text">question me</span>
+      <span class="button-icon">?</span>
+    </a>
   </div>
 </div>
 
