@@ -10,168 +10,213 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <audio id="background-music" src="music.mp3" loop></audio>
   <style>
-    body {
-      background-color: #000000; 
-      color: #ffffff; 
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-    .preloader {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-      background: #ffffff;
-    }
-    .preloader h1 {
-      font-family: "Press Start 2P", system-ui;
-      font-size: 24px;
-      margin-bottom: 30px;
-    }
-    .preloader button {
-      font-family: "Press Start 2P", system-ui;
-      padding: 15px 30px;
-      font-size: 18px;
-      border: 3px solid black;
-      border-radius: 10px;
-      background: transparent;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .heart-img {
-      display: block;
-      margin: 20px auto 30px;
-      width: 100px; /* Делаем сердечко не гигантским */
-      height: auto;
-      transition: transform 0.3s ease;
-      filter: invert(1);
-    }
-
+  body {
+    background-color: #000000; 
+    color: #ffffff; 
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .preloader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    background: #ffffff;
+  }
+  .preloader h1 {
+    font-family: "Press Start 2P", system-ui;
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+  .preloader button {
+    font-family: "Press Start 2P", system-ui;
+    padding: 15px 30px;
+    font-size: 18px;
+    border: 3px solid black;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .heart-img {
+    display: block;
+    margin: 20px auto 30px;
+    width: 100px;
+    height: auto;
+    transition: transform 0.3s ease;
+    filter: invert(1);
+  }
   .heart-img:hover {
     transform: scale(1.2);
+  }
+  .preloader button:hover {
+    background: black;
+    color: white;
+  }
+  .main-content {
+    display: none;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #ffffff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .avatar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #000000;
+    border-radius: 20px;
+    box-shadow: 0px 5px 15px rgb(255, 255, 255);
+    transition: transform 2s ease;
+    width: 150px;
+    height: 150px;
+  }
+  .avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0px 5px 15px rgb(0, 0, 0);
+    transition: transform 0.6s ease;
+  }
+  .avatar-container:hover img {
+    transform: rotate(360deg);
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .buttons a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 20px;
+    font-family: "Press Start 2P", system-ui;
+    gap: 12px;
+    padding: 15px 30px;
+    background-color: transparent;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 15px;
+    border: 3px solid #ffffff;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  .buttons a:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+  }
+  .buttons img {
+    filter: invert(1);
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-right: 10px;
+    transition: opacity 1s ease;
+    opacity: 0;
+  }
+  .buttons a:hover img {
+    opacity: 1;
+  }
+  .rainCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .support-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 20px;
+    font-family: "Press Start 2P", system-ui;
+    padding: 15px 30px;
+    background-color: transparent;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 15px;
+    border: 3px solid #ffffff;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  .support-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+  }
+
+  /* 📱 АДАПТАЦИЯ ДЛЯ МОБИЛОК */
+  @media (max-width: 600px) {
+    .preloader h1 {
+      font-size: 16px;
+      margin-bottom: 20px;
     }
-    .preloader button:hover {
-      background: black;
-      color: white;
-    }
-    .main-content {
-      display: none;
+    .preloader button {
+      padding: 10px 20px;
+      font-size: 14px;
     }
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      padding: 20px;
+      height: auto;
+      margin-top: 30px;
     }
     .content-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #ffffff;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
-      margin: 0 auto;
+      padding: 20px;
+      max-width: 90%;
     }
     .avatar-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #000000;
-      border-radius: 20px;
-      box-shadow: 0px 5px 15px rgb(255, 255, 255);
-      transition: transform 2s ease;
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 15px;
     }
-    .avatar-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      box-shadow: 0px 5px 15px rgb(0, 0, 0);
-      transition: transform 0.6s ease;
-    }
-    .avatar-container:hover img {
-      transform: rotate(360deg);
-    }
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 20px;
+    .heart-img {
+      width: 70px;
+      margin: 15px auto 20px;
     }
     .buttons a {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      font-size: 20px;
-      font-family: "Press Start 2P", system-ui;
-      gap: 12px;
-      padding: 15px 30px;
-      background-color: transparent;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 15px;
-      border: 3px solid #ffffff;
-      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-    }
-    .buttons a:hover {
-      transform: scale(1.1);
-      box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
+      font-size: 16px;
+      padding: 12px 20px;
+      gap: 10px;
     }
     .buttons img {
-      filter: invert(1);
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      margin-right: 10px;
-      transition: opacity 1s ease;
-      opacity: 0;
-    }
-    .buttons a:hover img {
-      opacity: 1;
-    }
-    .rainCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
+      width: 40px;
+      height: 40px;
+      margin-right: 8px;
     }
     .support-button {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      font-size: 20px;
-      font-family: "Press Start 2P", system-ui;
-      padding: 15px 30px;
-      background-color: transparent;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 15px;
-      border: 3px solid #ffffff;
-      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+      padding: 10px 20px;
+      font-size: 16px;
+      bottom: 15px;
+      right: 15px;
     }
-    .support-button:hover {
-      transform: scale(1.1);
-      box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.4);
-    }
-  </style>
+  }
+</style>
 </head>
 
 <body>
