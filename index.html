@@ -251,6 +251,7 @@
       text-overflow: ellipsis;
       margin-bottom: 5px;
       font-weight: bold;
+      order: 2; /* Перемещаем название вниз */
     }
 
     .music-artist {
@@ -261,6 +262,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       margin-bottom: 10px;
+      order: 3; /* Перемещаем исполнителя вниз */
     }
 
     .progress-container {
@@ -272,6 +274,7 @@
       position: relative;
       cursor: pointer;
       flex-grow: 1;
+      order: 1; /* Перемещаем прогресс-бар вверх */
     }
 
     .progress-bar {
@@ -308,6 +311,7 @@
       color: #ccc;
       margin-bottom: 10px;
       width: 200px;
+      order: 0; /* Перемещаем время в самый верх */
     }
 
     .player-controls {
@@ -334,42 +338,6 @@
 
     .play-pause-btn:hover {
       background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .volume-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      height: 100px;
-      justify-content: center;
-    }
-
-    .volume-icon {
-      font-size: 16px;
-      color: white;
-    }
-
-    .volume-slider {
-      width: 4px;
-      height: 80px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      outline: none;
-      cursor: pointer;
-      transform: rotate(180deg);
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      background: white;
-      border-radius: 50%;
-      cursor: pointer;
     }
 
     .track-info-container {
@@ -478,10 +446,6 @@
       .time-info {
         width: 150px;
       }
-
-      .volume-slider {
-        height: 60px;
-      }
     }
   </style>
 </head>
@@ -527,22 +491,19 @@
     <img src="music-cover.jpg" alt="Обложка" class="music-cover" id="musicCover">
     <div class="music-info">
       <div class="track-info-container">
+        <div class="time-info">
+          <span id="currentTime">0:00</span>
+          <span>/</span>
+          <span id="duration">0:00</span>
+        </div>
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
         <div class="music-title" id="musicTitle">Название трека</div>
         <div class="music-artist" id="musicArtist">Исполнитель</div>
       </div>
       <div class="player-main-section">
         <button class="play-pause-btn" id="playPauseBtn">▶</button>
-        <div class="progress-container" id="progressContainer">
-          <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="volume-container">
-          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
-          <span class="volume-icon">🔊</span>
-        </div>
-      </div>
-      <div class="time-info">
-        <span id="currentTime">0:00</span>
-        <span id="duration">0:00</span>
       </div>
     </div>
   </div>
@@ -696,7 +657,6 @@
   const progressContainer = document.getElementById('progressContainer');
   const currentTimeEl = document.getElementById('currentTime');
   const durationEl = document.getElementById('duration');
-  const volumeSlider = document.getElementById('volumeSlider');
   const music = document.getElementById('background-music');
   const musicTitle = document.getElementById('musicTitle');
   const musicArtist = document.getElementById('musicArtist');
@@ -746,11 +706,6 @@
       playPauseBtn.textContent = "❚❚";
     }
     isPlaying = !isPlaying;
-  });
-
-  // Обработчик изменения громкости
-  volumeSlider.addEventListener('input', () => {
-    music.volume = volumeSlider.value;
   });
 
   // Обработчик клика по прогресс-бару для перемотки
@@ -804,7 +759,7 @@
 
   // Инициализация плеера
   updateMusicInfo();
-  music.volume = volumeSlider.value;
+  music.volume = 0.5;
 </script>
 
 </body>
