@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>Pepel</title>
   <link id="favicon" rel="icon" href="avatar.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +11,8 @@
   <audio id="background-music" src="music1.mp3" loop></audio>
   <style>
     body {
-      background-color: #000000;
-      color: #ffffff;
+      background-color: #000000; 
+      color: #ffffff; 
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
@@ -211,10 +211,6 @@
 
     .music-player:hover {
       width: 300px;
-    }
-
-    .music-player.collapsed {
-      width: 80px;
     }
 
     .music-cover {
@@ -473,7 +469,7 @@
     <div class="music-info">
       <div class="music-title" id="musicTitle">Название трека</div>
       <div class="music-artist" id="musicArtist">Исполнитель</div>
-      <input type="range" id="volumeControl" class="volume-control" min="0" max="1" step="0.01" value="0.5">
+      <input type="range" id="volumeControl" class="volume-control" min="0" max="1" step="0.01" value="0.005">
     </div>
   </div>
 </div>
@@ -487,7 +483,7 @@
     continueButton.addEventListener("click", function () {
       const music = document.getElementById('background-music');
       if (music) {
-        music.volume = 0.5;
+        music.volume = 0.005;
         music.play().catch((e) => {
           console.log("Не удалось запустить музыку:", e);
         });
@@ -632,7 +628,6 @@
   let isPlaying = false;
   let hideTimeout;
   let isPlayerActive = false;
-  let inactivityTimer;
 
   // Обновление информации о треке
   function updateMusicInfo() {
@@ -651,74 +646,74 @@
     requestAnimationFrame(updateProgress);
   }
 
-  // Сворачивание плеера
-  function collapsePlayer() {
-    musicPlayer.classList.remove('active');
-    musicPlayer.classList.add('collapsed');
-  }
-
-  // Разворачивание плеера
-  function expandPlayer() {
-    musicPlayer.classList.add('active');
-    musicPlayer.classList.remove('collapsed');
-    resetInactivityTimer();
-  }
-
-  // Таймер неактивности
-  function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(collapsePlayer, 3000);
-  }
-
   // Обработчик клика по кнопке play/pause
   playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
       music.pause();
       playPauseBtn.textContent = "▶";
+      musicPlayer.classList.remove('active');
     } else {
       music.play();
       playPauseBtn.textContent = "❚❚";
+      musicPlayer.classList.add('active');
     }
     isPlaying = !isPlaying;
-    expandPlayer();
   });
 
   // Обработчик изменения громкости
   volumeControl.addEventListener('input', () => {
     music.volume = volumeControl.value;
-    expandPlayer();
   });
 
   // Обработчики для автоматического сворачивания
   musicPlayer.addEventListener('mouseenter', () => {
-    expandPlayer();
+    clearTimeout(hideTimeout);
+    musicPlayer.classList.add('active');
   });
 
   musicPlayer.addEventListener('mouseleave', () => {
-    resetInactivityTimer();
+    if (!isPlaying) {
+      startHideTimer();
+    }
   });
+
+  function startHideTimer() {
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+      musicPlayer.classList.remove('active');
+    }, 5000);
+  }
 
   // Инициализация плеера
   updateMusicInfo();
-  resetInactivityTimer();
+  startHideTimer();
 
   // Обновление прогресса при воспроизведении
   music.addEventListener('play', () => {
     isPlaying = true;
     playPauseBtn.textContent = "❚❚";
-    expandPlayer();
+    musicPlayer.classList.add('active');
     updateProgress();
   });
 
   music.addEventListener('pause', () => {
     isPlaying = false;
     playPauseBtn.textContent = "▶";
-    resetInactivityTimer();
+    if (!isPlayerActive) {
+      musicPlayer.classList.remove('active');
+    }
   });
 
   // Следим за активностью плеера
-  musicPlayer.addEventListener('mousemove', () => {
-    expandPlayer();
+  musicPlayer.addEventListener('mouseenter', () => {
+    isPlayerActive = true;
+  });
+
+  musicPlayer.addEventListener('mouseleave', () => {
+    isPlayerActive = false;
+    if (!isPlaying) {
+      startHideTimer();
+    }
   });
 </script>
 
