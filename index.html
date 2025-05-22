@@ -207,8 +207,8 @@
       overflow: hidden;
     }
 
-    .music-player.expanded {
-      width: 300px;
+    .music-player:hover {
+      width: 400px;
       justify-content: flex-start;
       padding: 15px;
     }
@@ -222,7 +222,7 @@
       transition: all 0.3s ease;
     }
 
-    .music-player.expanded .music-cover {
+    .music-player:hover .music-cover {
       margin-right: 15px;
     }
 
@@ -236,25 +236,26 @@
       transition: opacity 0.3s ease;
     }
 
-    .music-player.expanded .music-info {
+    .music-player:hover .music-info {
       display: flex;
       opacity: 1;
+      width: 100%;
     }
 
     .music-title {
       font-family: Arial, sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       color: white;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       margin-bottom: 5px;
-      font-weight: 500;
+      font-weight: bold;
     }
 
     .music-artist {
       font-family: Arial, sans-serif;
-      font-size: 12px;
+      font-size: 14px;
       color: #ccc;
       white-space: nowrap;
       overflow: hidden;
@@ -263,13 +264,14 @@
     }
 
     .progress-container {
-      width: 100%;
+      width: 200px;
       height: 4px;
       background-color: rgba(255, 255, 255, 0.2);
       border-radius: 2px;
       margin-bottom: 10px;
       position: relative;
       cursor: pointer;
+      flex-grow: 1;
     }
 
     .progress-bar {
@@ -302,16 +304,16 @@
       display: flex;
       justify-content: space-between;
       font-family: Arial, sans-serif;
-      font-size: 11px;
+      font-size: 12px;
       color: #ccc;
       margin-bottom: 10px;
+      width: 200px;
     }
 
     .player-controls {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      width: 100%;
+      gap: 15px;
     }
 
     .play-pause-btn {
@@ -327,6 +329,7 @@
       justify-content: center;
       border-radius: 50%;
       transition: all 0.3s ease;
+      flex-shrink: 0;
     }
 
     .play-pause-btn:hover {
@@ -335,8 +338,11 @@
 
     .volume-container {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 8px;
+      height: 100px;
+      justify-content: center;
     }
 
     .volume-icon {
@@ -345,14 +351,15 @@
     }
 
     .volume-slider {
-      width: 80px;
-      height: 4px;
+      width: 4px;
+      height: 80px;
       -webkit-appearance: none;
       appearance: none;
       background: rgba(255, 255, 255, 0.2);
       border-radius: 2px;
       outline: none;
       cursor: pointer;
+      transform: rotate(180deg);
     }
 
     .volume-slider::-webkit-slider-thumb {
@@ -363,6 +370,20 @@
       background: white;
       border-radius: 50%;
       cursor: pointer;
+    }
+
+    .track-info-container {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex-grow: 1;
+    }
+
+    .player-main-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
     }
 
     /* 📱 АДАПТАЦИЯ ДЛЯ МОБИЛОК */
@@ -433,7 +454,7 @@
         bottom: 70px;
       }
       
-      .music-player.expanded {
+      .music-player:hover {
         width: calc(100% - 40px);
       }
       
@@ -443,15 +464,23 @@
       }
       
       .music-title {
-        font-size: 12px;
+        font-size: 14px;
       }
 
       .music-artist {
-        font-size: 10px;
+        font-size: 12px;
+      }
+
+      .progress-container {
+        width: 150px;
+      }
+
+      .time-info {
+        width: 150px;
       }
 
       .volume-slider {
-        width: 60px;
+        height: 60px;
       }
     }
   </style>
@@ -497,21 +526,23 @@
   <div class="music-player" id="musicPlayer">
     <img src="music-cover.jpg" alt="Обложка" class="music-cover" id="musicCover">
     <div class="music-info">
-      <div class="music-title" id="musicTitle">Название трека</div>
-      <div class="music-artist" id="musicArtist">Исполнитель</div>
-      <div class="progress-container" id="progressContainer">
-        <div class="progress-bar" id="progressBar"></div>
+      <div class="track-info-container">
+        <div class="music-title" id="musicTitle">Название трека</div>
+        <div class="music-artist" id="musicArtist">Исполнитель</div>
+      </div>
+      <div class="player-main-section">
+        <button class="play-pause-btn" id="playPauseBtn">▶</button>
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="volume-container">
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+          <span class="volume-icon">🔊</span>
+        </div>
       </div>
       <div class="time-info">
         <span id="currentTime">0:00</span>
         <span id="duration">0:00</span>
-      </div>
-      <div class="player-controls">
-        <button class="play-pause-btn" id="playPauseBtn">▶</button>
-        <div class="volume-container">
-          <span class="volume-icon">🔊</span>
-          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
-        </div>
       </div>
     </div>
   </div>
@@ -673,7 +704,6 @@
 
   let isPlaying = false;
   let isDragging = false;
-  let hideTimeout;
 
   // Форматирование времени в минуты:секунды
   function formatTime(seconds) {
@@ -752,45 +782,16 @@
     isDragging = false;
   });
 
-  // Обработчики для разворачивания/сворачивания плеера
-  musicPlayer.addEventListener('click', () => {
-    if (!musicPlayer.classList.contains('expanded')) {
-      musicPlayer.classList.add('expanded');
-      clearTimeout(hideTimeout);
-      hideTimeout = setTimeout(() => {
-        if (!isPlaying) {
-          musicPlayer.classList.remove('expanded');
-        }
-      }, 5000);
-    }
-  });
-
-  // Автоматическое сворачивание при уходе курсора
-  musicPlayer.addEventListener('mouseleave', () => {
-    if (!isPlaying) {
-      startHideTimer();
-    }
-  });
-
-  function startHideTimer() {
-    clearTimeout(hideTimeout);
-    hideTimeout = setTimeout(() => {
-      musicPlayer.classList.remove('expanded');
-    }, 3000);
-  }
-
   // Обновление прогресса при воспроизведении
   music.addEventListener('play', () => {
     isPlaying = true;
     playPauseBtn.textContent = "❚❚";
-    musicPlayer.classList.add('expanded');
     updateProgress();
   });
 
   music.addEventListener('pause', () => {
     isPlaying = false;
     playPauseBtn.textContent = "▶";
-    startHideTimer();
   });
 
   // Сброс времени при окончании трека
@@ -799,7 +800,6 @@
     currentTimeEl.textContent = "0:00";
     playPauseBtn.textContent = "▶";
     isPlaying = false;
-    startHideTimer();
   });
 
   // Инициализация плеера
