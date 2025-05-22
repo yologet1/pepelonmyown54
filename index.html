@@ -218,6 +218,8 @@
       border-radius: 10px;
       object-fit: cover;
       flex-shrink: 0;
+      padding: 5px;
+      box-sizing: border-box;
     }
 
     .music-info {
@@ -230,7 +232,7 @@
       transition: opacity 0.3s ease;
     }
 
-    .music-player:hover .music-info {
+    .music-player.active .music-info {
       opacity: 1;
     }
 
@@ -255,6 +257,7 @@
 
     .music-controls {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 10px;
     }
@@ -279,23 +282,25 @@
     }
 
     .progress-container {
-      width: 100%;
-      height: 4px;
+      width: 4px;
+      height: 60px;
       background-color: rgba(255, 255, 255, 0.2);
       border-radius: 2px;
-      margin-top: 5px;
+      margin: 0 10px;
       overflow: hidden;
+      display: flex;
+      flex-direction: column-reverse;
     }
 
     .progress-bar {
-      height: 100%;
+      width: 100%;
       background-color: white;
-      width: 0%;
-      transition: width 0.1s linear;
+      height: 0%;
+      transition: height 0.1s linear;
     }
 
     .volume-control {
-      width: 80px;
+      width: 60px;
       height: 4px;
       -webkit-appearance: none;
       appearance: none;
@@ -303,6 +308,17 @@
       border-radius: 2px;
       outline: none;
       margin-top: 5px;
+      transform: rotate(-90deg);
+      transform-origin: left;
+      position: absolute;
+      left: 70px;
+      bottom: 30px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .music-player.active .volume-control {
+      opacity: 1;
     }
 
     .volume-control::-webkit-slider-thumb {
@@ -395,6 +411,11 @@
       .music-title {
         font-size: 10px;
       }
+
+      .volume-control {
+        left: 50px;
+        bottom: 20px;
+      }
     }
   </style>
 </head>
@@ -438,16 +459,16 @@
   <!-- Музыкальный плеер -->
   <div class="music-player" id="musicPlayer">
     <img src="music-cover.jpg" alt="Обложка" class="music-cover" id="musicCover">
-    <div class="music-info">
-      <div class="music-title" id="musicTitle">мне так жаль</div>
-      <div class="music-artist" id="musicArtist">lxner</div>
-      <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <input type="range" id="volumeControl" class="volume-control" min="0" max="1" step="0.01" value="0.5">
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
     <div class="music-controls">
       <button class="music-btn" id="playPauseBtn">▶</button>
+    </div>
+    <div class="music-info">
+      <div class="music-title" id="musicTitle">Название трека</div>
+      <div class="music-artist" id="musicArtist">Исполнитель</div>
+      <input type="range" id="volumeControl" class="volume-control" min="0" max="1" step="0.01" value="0.005">
     </div>
   </div>
 </div>
@@ -461,7 +482,7 @@
     continueButton.addEventListener("click", function () {
       const music = document.getElementById('background-music');
       if (music) {
-        music.volume = 0.5;
+        music.volume = 0.005;
         music.play().catch((e) => {
           console.log("Не удалось запустить музыку:", e);
         });
@@ -605,7 +626,7 @@
 
   let isPlaying = false;
   let hideTimeout;
-  let isHoveringPlayer = false;
+  let isPlayerActive = false;
 
   // Обновление информации о треке
   function updateMusicInfo() {
@@ -619,7 +640,7 @@
   function updateProgress() {
     if (music.duration) {
       const progress = (music.currentTime / music.duration) * 100;
-      progressBar.style.width = `${progress}%`;
+      progressBar.style.height = `${progress}%`;
     }
     requestAnimationFrame(updateProgress);
   }
@@ -629,9 +650,11 @@
     if (isPlaying) {
       music.pause();
       playPauseBtn.textContent = "▶";
+      musicPlayer.classList.remove('active');
     } else {
       music.play();
       playPauseBtn.textContent = "❚❚";
+      musicPlayer.classList.add('active');
     }
     isPlaying = !isPlaying;
   });
@@ -641,39 +664,22 @@
     music.volume = volumeControl.value;
   });
 
-  // Обработчик клика по прогресс-бару для перемотки
-  document.querySelector('.progress-container').addEventListener('click', (e) => {
-    if (music.duration) {
-      const rect = e.target.getBoundingClientRect();
-      const pos = (e.clientX - rect.left) / rect.width;
-      music.currentTime = pos * music.duration;
-    }
-  });
-
   // Обработчики для автоматического сворачивания
   musicPlayer.addEventListener('mouseenter', () => {
-    isHoveringPlayer = true;
     clearTimeout(hideTimeout);
-    musicPlayer.style.width = '300px';
-    if (window.innerWidth <= 420) {
-      musicPlayer.style.width = 'calc(100% - 40px)';
-    }
+    musicPlayer.classList.add('active');
   });
 
   musicPlayer.addEventListener('mouseleave', () => {
-    isHoveringPlayer = false;
-    startHideTimer();
+    if (!isPlaying) {
+      startHideTimer();
+    }
   });
 
   function startHideTimer() {
     clearTimeout(hideTimeout);
     hideTimeout = setTimeout(() => {
-      if (!isHoveringPlayer) {
-        musicPlayer.style.width = '80px';
-        if (window.innerWidth <= 420) {
-          musicPlayer.style.width = '60px';
-        }
-      }
+      musicPlayer.classList.remove('active');
     }, 5000);
   }
 
@@ -685,18 +691,33 @@
   music.addEventListener('play', () => {
     isPlaying = true;
     playPauseBtn.textContent = "❚❚";
+    musicPlayer.classList.add('active');
     updateProgress();
   });
 
   music.addEventListener('pause', () => {
     isPlaying = false;
     playPauseBtn.textContent = "▶";
+    if (!isPlayerActive) {
+      musicPlayer.classList.remove('active');
+    }
+  });
+
+  // Следим за активностью плеера
+  musicPlayer.addEventListener('mouseenter', () => {
+    isPlayerActive = true;
+  });
+
+  musicPlayer.addEventListener('mouseleave', () => {
+    isPlayerActive = false;
+    if (!isPlaying) {
+      startHideTimer();
+    }
   });
 </script>
 
 </body>
 </html>
-
 
 
 
