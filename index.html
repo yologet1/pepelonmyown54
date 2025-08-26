@@ -692,6 +692,56 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// Функция создания нескольких пауков
+function many(count, spawn) {
+  return Array.from({ length: count }, () => spawn());
+}
+
+// Создание одного паука
+function spawn() {
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: 0,
+    vy: 0,
+    size: 8,
+    targetX: null,
+    targetY: null,
+
+    follow(x, y) {
+      this.targetX = x;
+      this.targetY = y;
+    },
+
+    tick() {
+      if (this.targetX !== null && this.targetY !== null) {
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const speed = 0.05;
+
+        if (dist > 1) {
+          this.vx += (dx / dist) * speed;
+          this.vy += (dy / dist) * speed;
+        }
+      }
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Немного замедляем движение, чтобы пауки не улетали слишком быстро
+      this.vx *= 0.9;
+      this.vy *= 0.9;
+
+      // Рисуем паука
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+    }
+  };
+}
+
 const spiders = many(2, spawn);
 
 addEventListener("pointermove", (e) => {
@@ -700,14 +750,15 @@ addEventListener("pointermove", (e) => {
   });
 });
 
-requestAnimationFrame(function anim(t) {
-  if (canvas.width !== innerWidth) canvas.width = innerWidth;
-  if (canvas.height !== innerHeight) canvas.height = innerHeight;
-
+requestAnimationFrame(function anim() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  spiders.forEach(spider => spider.tick(t));
+  spiders.forEach(spider => spider.tick());
   requestAnimationFrame(anim);
+});
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 });
 </script>
 
