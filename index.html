@@ -687,6 +687,7 @@
   // Initialize
   updateMusicInfo();
 
+// === ПАУКИ ===
 class Spider {
   constructor(color) {
     this.x = Math.random() * rainCanvas.width;
@@ -739,14 +740,14 @@ class Spider {
     ctxRain.fillStyle = this.color;
     ctxRain.fill();
 
-    // Голова
+    // Голова паука
     ctxRain.beginPath();
     ctxRain.arc(0, -this.size * 0.6, this.size / 3, 0, Math.PI * 2);
     ctxRain.fill();
 
     ctxRain.restore();
 
-    // Лапки → тянутся к ближайшим каплям дождя
+    // Лапки → соединяем паука с ближайшими каплями дождя
     const nearest = this.getNearestDrops(4);
     ctxRain.strokeStyle = this.color;
     ctxRain.lineWidth = 2;
@@ -760,8 +761,8 @@ class Spider {
   }
 }
 
-// === СОЗДАЁМ ПАУКОВ ===
-const spiders = [new Spider("#000"), new Spider("#000")];
+// === СОЗДАЁМ ДВУХ БЕЛЫХ ПАУКОВ ===
+const spiders = [new Spider("#fff"), new Spider("#fff")];
 let spiderMouseX = rainCanvas.width / 2;
 let spiderMouseY = rainCanvas.height / 2;
 
@@ -781,7 +782,7 @@ function drawRainWithSpiders() {
     drop.y += drop.speedY;
     ctxRain.beginPath();
     ctxRain.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
-    ctxRain.fillStyle = `rgba(80, 80, 80, ${drop.opacity})`;
+    ctxRain.fillStyle = `rgba(255, 255, 255, ${drop.opacity})`;
     ctxRain.fill();
     if (drop.y > rainCanvas.height) Object.assign(drop, createDrop());
   }
@@ -797,6 +798,7 @@ function drawRainWithSpiders() {
 
 // Запускаем анимацию
 drawRainWithSpiders();
+
 </script>
 
 </body>
