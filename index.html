@@ -816,11 +816,12 @@ function drawRainWithSpiders(time) {
     spider.draw(time);
   });
 
-  requestAnimationFrame(drawRainWithSpiders);
+  requestAnimationFrame(drawRainWithSpiders); // <-- правильно
 }
 
-drawRainWithSpiders();
-
+// Запускаем анимацию через requestAnimationFrame
+requestAnimationFrame(drawRainWithSpiders);
+  
 </script>
 
 </body>
