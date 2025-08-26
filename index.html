@@ -687,102 +687,116 @@
   // Initialize
   updateMusicInfo();
 
-const spiderCanvas = document.getElementById("spiderCanvas");
-const spiderCtx = spiderCanvas.getContext("2d");
-spiderCanvas.width = window.innerWidth;
-spiderCanvas.height = window.innerHeight;
-
-const spiders = [];
-
-// Класс паука
 class Spider {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.baseY = y;
-    this.size = 14;
-    this.legs = 8;
-    this.angle = Math.random() * Math.PI * 2;
-    this.swing = Math.random() * 0.05 + 0.02;
-    this.lineLength = Math.random() * 150 + 100;
+  constructor(color) {
+    this.x = Math.random() * rainCanvas.width;
+    this.y = Math.random() * rainCanvas.height;
+    this.size = 18;
+    this.color = color;
+    this.speed = 3;
+    this.angle = 0;
+    this.targetX = this.x;
+    this.targetY = this.y;
+  }
+
+  follow(x, y) {
+    this.targetX = x;
+    this.targetY = y;
+  }
+
+  // Находим ближайшие капли дождя
+  getNearestDrops(count = 4) {
+    return [...drops]
+      .map(drop => ({
+        drop,
+        dist: Math.hypot(this.x - drop.x, this.y - drop.y)
+      }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, count)
+      .map(d => d.drop);
+  }
+
+  update() {
+    const dx = this.targetX - this.x;
+    const dy = this.targetY - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > 1) {
+      this.x += (dx / dist) * this.speed;
+      this.y += (dy / dist) * this.speed;
+      this.angle = Math.atan2(dy, dx);
+    }
   }
 
   draw() {
-    // Рисуем паутинку
-    spiderCtx.beginPath();
-    spiderCtx.moveTo(this.x, 0);
-    spiderCtx.lineTo(this.x, this.y - this.size / 2);
-    spiderCtx.strokeStyle = "rgba(255,255,255,0.5)";
-    spiderCtx.lineWidth = 1;
-    spiderCtx.stroke();
+    // Тело паука
+    ctxRain.save();
+    ctxRain.translate(this.x, this.y);
+    ctxRain.rotate(this.angle + Math.PI / 2);
 
-    // Рисуем тело паука
-    spiderCtx.beginPath();
-    spiderCtx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
-    spiderCtx.fillStyle = "#000";
-    spiderCtx.fill();
-    spiderCtx.strokeStyle = "#fff";
-    spiderCtx.stroke();
+    ctxRain.beginPath();
+    ctxRain.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+    ctxRain.fillStyle = this.color;
+    ctxRain.fill();
 
-    // Лапки
-    spiderCtx.strokeStyle = "#fff";
-    for (let i = 0; i < this.legs; i++) {
-      const angle = (Math.PI / (this.legs / 2)) * i + this.angle;
-      const legX = this.x + Math.cos(angle) * this.size;
-      const legY = this.y + Math.sin(angle) * this.size;
-      spiderCtx.beginPath();
-      spiderCtx.moveTo(this.x, this.y);
-      spiderCtx.lineTo(legX, legY);
-      spiderCtx.stroke();
-    }
-  }
+    // Голова
+    ctxRain.beginPath();
+    ctxRain.arc(0, -this.size * 0.6, this.size / 3, 0, Math.PI * 2);
+    ctxRain.fill();
 
-  update(mouseX_spider, mouseY_spider) {
-    // Плавное покачивание
-    this.angle += this.swing;
+    ctxRain.restore();
 
-    // Проверка расстояния до курсора
-    const dx = mouseX_spider - this.x;
-    const dy = mouseY_spider - this.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < 80) {
-      this.y += 4; // спускается вниз, если мышь близко
-    } else {
-      this.y += (this.baseY - this.y) * 0.05; // возвращается обратно
-    }
+    // Лапки → тянутся к ближайшим каплям дождя
+    const nearest = this.getNearestDrops(4);
+    ctxRain.strokeStyle = this.color;
+    ctxRain.lineWidth = 2;
+
+    nearest.forEach(drop => {
+      ctxRain.beginPath();
+      ctxRain.moveTo(this.x, this.y);
+      ctxRain.lineTo(drop.x, drop.y);
+      ctxRain.stroke();
+    });
   }
 }
 
-// Создаём несколько пауков
-for (let i = 0; i < 5; i++) {
-  spiders.push(new Spider(Math.random() * spiderCanvas.width, Math.random() * 200 + 50));
-}
-
-let mouseX_spider = -9999;
-let mouseY_spider = -9999;
+// === СОЗДАЁМ ПАУКОВ ===
+const spiders = [new Spider("#000"), new Spider("#000")];
+let spiderMouseX = rainCanvas.width / 2;
+let spiderMouseY = rainCanvas.height / 2;
 
 window.addEventListener("mousemove", (e) => {
-  mouseX_spider = e.clientX;
-  mouseY_spider = e.clientY;
+  spiderMouseX = e.clientX;
+  spiderMouseY = e.clientY;
+  spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
 });
 
-function animateSpiders() {
-  spiderCtx.clearRect(0, 0, spiderCanvas.width, spiderCanvas.height);
+// === ВСТРАИВАЕМ В АНИМАЦИЮ ДОЖДЯ ===
+function drawRainWithSpiders() {
+  ctxRain.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
 
+  // Рисуем дождь
+  for (let drop of drops) {
+    drop.opacity = Math.max(0.1, Math.min(1, 1 - (drop.y / rainCanvas.height)));
+    drop.y += drop.speedY;
+    ctxRain.beginPath();
+    ctxRain.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
+    ctxRain.fillStyle = `rgba(80, 80, 80, ${drop.opacity})`;
+    ctxRain.fill();
+    if (drop.y > rainCanvas.height) Object.assign(drop, createDrop());
+  }
+
+  // Рисуем пауков
   spiders.forEach(spider => {
-    spider.update(mouseX_spider, mouseY_spider);
+    spider.update();
     spider.draw();
   });
 
-  requestAnimationFrame(animateSpiders);
+  requestAnimationFrame(drawRainWithSpiders);
 }
 
-animateSpiders();
-
-window.addEventListener("resize", () => {
-  spiderCanvas.width = window.innerWidth;
-  spiderCanvas.height = window.innerHeight;
-});
+// Запускаем анимацию
+drawRainWithSpiders();
 </script>
 
 </body>
