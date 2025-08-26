@@ -692,17 +692,37 @@ class Spider {
   constructor(color) {
     this.x = Math.random() * rainCanvas.width;
     this.y = Math.random() * rainCanvas.height;
-    this.size = 18;
     this.color = color;
-    this.speed = 3;
-    this.angle = 0;
+    this.size = 12;            // длина лапок
+    this.speed = 2.5;          // скорость движения
+    this.segments = 3;         // сегменты лапки (ломаная линия)
+    this.legs = 8;             // количество лапок
     this.targetX = this.x;
     this.targetY = this.y;
   }
 
   follow(x, y) {
-    this.targetX = x;
-    this.targetY = y;
+    // паук двигается к курсору, но не доходит на 60px
+    const dx = x - this.x;
+    const dy = y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const comfort = 60; // минимальное расстояние до курсора
+
+    if (dist > comfort) {
+      this.targetX = x - (dx / dist) * comfort;
+      this.targetY = y - (dy / dist) * comfort;
+    }
+  }
+
+  avoid(otherSpider) {
+    // если пауки слишком близко — отталкиваются
+    const dx = otherSpider.x - this.x;
+    const dy = otherSpider.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 50) {
+      this.x -= dx * 0.02;
+      this.y -= dy * 0.02;
+    }
   }
 
   // Находим ближайшие капли дождя
@@ -725,33 +745,39 @@ class Spider {
     if (dist > 1) {
       this.x += (dx / dist) * this.speed;
       this.y += (dy / dist) * this.speed;
-      this.angle = Math.atan2(dy, dx);
     }
   }
 
   draw() {
-    // Тело паука
-    ctxRain.save();
-    ctxRain.translate(this.x, this.y);
-    ctxRain.rotate(this.angle + Math.PI / 2);
-
-    ctxRain.beginPath();
-    ctxRain.arc(0, 0, this.size / 2, 0, Math.PI * 2);
-    ctxRain.fillStyle = this.color;
-    ctxRain.fill();
-
-    // Голова паука
-    ctxRain.beginPath();
-    ctxRain.arc(0, -this.size * 0.6, this.size / 3, 0, Math.PI * 2);
-    ctxRain.fill();
-
-    ctxRain.restore();
-
-    // Лапки → соединяем паука с ближайшими каплями дождя
     const nearest = this.getNearestDrops(4);
-    ctxRain.strokeStyle = this.color;
-    ctxRain.lineWidth = 2;
 
+    ctxRain.strokeStyle = this.color;
+    ctxRain.lineWidth = 1.5;
+
+    // Рисуем лапки как молнии
+    for (let i = 0; i < this.legs; i++) {
+      const angle = (Math.PI * 2 / this.legs) * i;
+      let startX = this.x;
+      let startY = this.y;
+
+      ctxRain.beginPath();
+      ctxRain.moveTo(startX, startY);
+
+      for (let s = 0; s < this.segments; s++) {
+        const segLength = this.size / this.segments;
+        const randomOffset = (Math.random() - 0.5) * 8; // "ломаность" лапки
+        const endX = startX + Math.cos(angle) * segLength + randomOffset;
+        const endY = startY + Math.sin(angle) * segLength + randomOffset;
+
+        ctxRain.lineTo(endX, endY);
+        startX = endX;
+        startY = endY;
+      }
+
+      ctxRain.stroke();
+    }
+
+    // Лапки к ближайшим каплям дождя
     nearest.forEach(drop => {
       ctxRain.beginPath();
       ctxRain.moveTo(this.x, this.y);
@@ -761,7 +787,7 @@ class Spider {
   }
 }
 
-// === СОЗДАЁМ ДВУХ БЕЛЫХ ПАУКОВ ===
+// === СОЗДАЁМ ДВУХ ПАУКОВ ===
 const spiders = [new Spider("#fff"), new Spider("#fff")];
 let spiderMouseX = rainCanvas.width / 2;
 let spiderMouseY = rainCanvas.height / 2;
@@ -772,7 +798,7 @@ window.addEventListener("mousemove", (e) => {
   spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
 });
 
-// === ВСТРАИВАЕМ В АНИМАЦИЮ ДОЖДЯ ===
+// === ОБНОВЛЕНИЕ АНИМАЦИИ ===
 function drawRainWithSpiders() {
   ctxRain.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
 
@@ -787,7 +813,10 @@ function drawRainWithSpiders() {
     if (drop.y > rainCanvas.height) Object.assign(drop, createDrop());
   }
 
-  // Рисуем пауков
+  // Пауки двигаются и избегают друг друга
+  spiders[0].avoid(spiders[1]);
+  spiders[1].avoid(spiders[0]);
+
   spiders.forEach(spider => {
     spider.update();
     spider.draw();
@@ -796,7 +825,6 @@ function drawRainWithSpiders() {
   requestAnimationFrame(drawRainWithSpiders);
 }
 
-// Запускаем анимацию
 drawRainWithSpiders();
 
 </script>
