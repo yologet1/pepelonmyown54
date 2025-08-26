@@ -687,14 +687,14 @@
   // Initialize
   updateMusicInfo();
 
-const canvas = document.getElementById("spiderCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const spiderCanvas = document.getElementById("spiderCanvas");
+const spiderCtx = spiderCanvas.getContext("2d");
+spiderCanvas.width = window.innerWidth;
+spiderCanvas.height = window.innerHeight;
 
 const spiders = [];
 
-// Создаём паука
+// Класс паука
 class Spider {
   constructor(x, y) {
     this.x = x;
@@ -709,80 +709,79 @@ class Spider {
 
   draw() {
     // Рисуем паутинку
-    ctx.beginPath();
-    ctx.moveTo(this.x, 0);
-    ctx.lineTo(this.x, this.y - this.size / 2);
-    ctx.strokeStyle = "rgba(255,255,255,0.5)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    spiderCtx.beginPath();
+    spiderCtx.moveTo(this.x, 0);
+    spiderCtx.lineTo(this.x, this.y - this.size / 2);
+    spiderCtx.strokeStyle = "rgba(255,255,255,0.5)";
+    spiderCtx.lineWidth = 1;
+    spiderCtx.stroke();
 
     // Рисуем тело паука
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
-    ctx.fillStyle = "#000";
-    ctx.fill();
-    ctx.strokeStyle = "#fff";
-    ctx.stroke();
+    spiderCtx.beginPath();
+    spiderCtx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+    spiderCtx.fillStyle = "#000";
+    spiderCtx.fill();
+    spiderCtx.strokeStyle = "#fff";
+    spiderCtx.stroke();
 
     // Лапки
-    ctx.strokeStyle = "#fff";
+    spiderCtx.strokeStyle = "#fff";
     for (let i = 0; i < this.legs; i++) {
       const angle = (Math.PI / (this.legs / 2)) * i + this.angle;
       const legX = this.x + Math.cos(angle) * this.size;
       const legY = this.y + Math.sin(angle) * this.size;
-      ctx.beginPath();
-      ctx.moveTo(this.x, this.y);
-      ctx.lineTo(legX, legY);
-      ctx.stroke();
+      spiderCtx.beginPath();
+      spiderCtx.moveTo(this.x, this.y);
+      spiderCtx.lineTo(legX, legY);
+      spiderCtx.stroke();
     }
   }
 
-  update(mouseX, mouseY) {
+  update(mouseX_spider, mouseY_spider) {
     // Плавное покачивание
     this.angle += this.swing;
 
-    // Если курсор близко — паук отпрыгивает
-    const dx = mouseX - this.x;
-    const dy = mouseY - this.y;
+    // Проверка расстояния до курсора
+    const dx = mouseX_spider - this.x;
+    const dy = mouseY_spider - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 80) {
-      this.y += 4; // спускается
+      this.y += 4; // спускается вниз, если мышь близко
     } else {
-      // возвращается обратно
-      this.y += (this.baseY - this.y) * 0.05;
+      this.y += (this.baseY - this.y) * 0.05; // возвращается обратно
     }
   }
 }
 
 // Создаём несколько пауков
 for (let i = 0; i < 5; i++) {
-  spiders.push(new Spider(Math.random() * canvas.width, Math.random() * 200 + 50));
+  spiders.push(new Spider(Math.random() * spiderCanvas.width, Math.random() * 200 + 50));
 }
 
-let mouseX = -9999;
-let mouseY = -9999;
+let mouseX_spider = -9999;
+let mouseY_spider = -9999;
 
 window.addEventListener("mousemove", (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+  mouseX_spider = e.clientX;
+  mouseY_spider = e.clientY;
 });
 
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function animateSpiders() {
+  spiderCtx.clearRect(0, 0, spiderCanvas.width, spiderCanvas.height);
 
   spiders.forEach(spider => {
-    spider.update(mouseX, mouseY);
+    spider.update(mouseX_spider, mouseY_spider);
     spider.draw();
   });
 
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animateSpiders);
 }
 
-animate();
+animateSpiders();
 
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  spiderCanvas.width = window.innerWidth;
+  spiderCanvas.height = window.innerHeight;
 });
 </script>
 
