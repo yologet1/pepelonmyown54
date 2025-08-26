@@ -749,38 +749,36 @@ class Spider {
     ctxRain.strokeStyle = this.color;
     ctxRain.lineWidth = 1.6;
 
-    // Берём ближайшие капли
     const nearest = this.getNearestDrops(this.legs);
 
-    // Каждая лапка цепляется за каплю
     nearest.forEach((drop, i) => {
-      let startX = this.x;
-      let startY = this.y;
-      const dx = drop.x - this.x;
-      const dy = drop.y - this.y;
-      const angle = Math.atan2(dy, dx);
+        let startX = this.x;
+        let startY = this.y;
 
-      ctxRain.beginPath();
-      ctxRain.moveTo(startX, startY);
+        // Направление к капле
+        const dx = drop.x - this.x;
+        const dy = drop.y - this.y;
+        const angle = Math.atan2(dy, dx);
 
-      for (let s = 0; s < this.segments; s++) {
-        const segLength = (this.legLength / this.segments);
+        ctxRain.beginPath();
+        ctxRain.moveTo(startX, startY);
 
-        // Динамическое колебание лапки
-        const wave = Math.sin(time * 0.006 + i * 2 + s) * 8;
+        for (let s = 0; s < this.segments; s++) {
+            const segLength = this.legLength / this.segments * 0.5; // делаем лапку короче
 
-        const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * wave;
-        const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * wave;
+            // Молниевидные зигзаги
+            const zigzag = (Math.random() - 0.5) * 15; // резкий сдвиг в перпендикуляр
+            const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * zigzag;
+            const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * zigzag;
 
-        ctxRain.lineTo(endX, endY);
-        startX = endX;
-        startY = endY;
-      }
+            ctxRain.lineTo(endX, endY);
+            startX = endX;
+            startY = endY;
+        }
 
-      ctxRain.lineTo(drop.x, drop.y);
-      ctxRain.stroke();
+        ctxRain.lineTo(drop.x, drop.y);
+        ctxRain.stroke();
     });
-  }
 }
 
 // === СОЗДАЁМ ДВУХ ПАУКОВ ===
