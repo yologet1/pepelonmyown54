@@ -693,20 +693,19 @@ class Spider {
     this.x = Math.random() * rainCanvas.width;
     this.y = Math.random() * rainCanvas.height;
     this.color = color;
-    this.size = 12;            // длина лапок
-    this.speed = 2.5;          // скорость движения
-    this.segments = 3;         // сегменты лапки (ломаная линия)
-    this.legs = 8;             // количество лапок
+    this.legs = 8;         // количество лапок
+    this.segments = 4;     // сегменты лапки (ломаная линия)
+    this.speed = 2.2;      // скорость движения паука
+    this.legLength = 60;   // длина лапки
     this.targetX = this.x;
     this.targetY = this.y;
   }
 
   follow(x, y) {
-    // паук двигается к курсору, но не доходит на 60px
     const dx = x - this.x;
     const dy = y - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const comfort = 60; // минимальное расстояние до курсора
+    const comfort = 80;
 
     if (dist > comfort) {
       this.targetX = x - (dx / dist) * comfort;
@@ -715,18 +714,16 @@ class Spider {
   }
 
   avoid(otherSpider) {
-    // если пауки слишком близко — отталкиваются
     const dx = otherSpider.x - this.x;
     const dy = otherSpider.y - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < 50) {
-      this.x -= dx * 0.02;
-      this.y -= dy * 0.02;
+    if (dist < 80) {
+      this.x -= dx * 0.03;
+      this.y -= dy * 0.03;
     }
   }
 
-  // Находим ближайшие капли дождя
-  getNearestDrops(count = 4) {
+  getNearestDrops(count = this.legs) {
     return [...drops]
       .map(drop => ({
         drop,
@@ -748,39 +745,38 @@ class Spider {
     }
   }
 
-  draw() {
-    const nearest = this.getNearestDrops(4);
-
+  draw(time) {
     ctxRain.strokeStyle = this.color;
-    ctxRain.lineWidth = 1.5;
+    ctxRain.lineWidth = 1.6;
 
-    // Рисуем лапки как молнии
-    for (let i = 0; i < this.legs; i++) {
-      const angle = (Math.PI * 2 / this.legs) * i;
+    // Берём ближайшие капли
+    const nearest = this.getNearestDrops(this.legs);
+
+    // Каждая лапка цепляется за каплю
+    nearest.forEach((drop, i) => {
       let startX = this.x;
       let startY = this.y;
+      const dx = drop.x - this.x;
+      const dy = drop.y - this.y;
+      const angle = Math.atan2(dy, dx);
 
       ctxRain.beginPath();
       ctxRain.moveTo(startX, startY);
 
       for (let s = 0; s < this.segments; s++) {
-        const segLength = this.size / this.segments;
-        const randomOffset = (Math.random() - 0.5) * 8; // "ломаность" лапки
-        const endX = startX + Math.cos(angle) * segLength + randomOffset;
-        const endY = startY + Math.sin(angle) * segLength + randomOffset;
+        const segLength = (this.legLength / this.segments);
+
+        // Динамическое колебание лапки
+        const wave = Math.sin(time * 0.006 + i * 2 + s) * 8;
+
+        const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * wave;
+        const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * wave;
 
         ctxRain.lineTo(endX, endY);
         startX = endX;
         startY = endY;
       }
 
-      ctxRain.stroke();
-    }
-
-    // Лапки к ближайшим каплям дождя
-    nearest.forEach(drop => {
-      ctxRain.beginPath();
-      ctxRain.moveTo(this.x, this.y);
       ctxRain.lineTo(drop.x, drop.y);
       ctxRain.stroke();
     });
@@ -798,8 +794,8 @@ window.addEventListener("mousemove", (e) => {
   spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
 });
 
-// === ОБНОВЛЕНИЕ АНИМАЦИИ ===
-function drawRainWithSpiders() {
+// === АНИМАЦИЯ ===
+function drawRainWithSpiders(time) {
   ctxRain.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
 
   // Рисуем дождь
@@ -819,7 +815,7 @@ function drawRainWithSpiders() {
 
   spiders.forEach(spider => {
     spider.update();
-    spider.draw();
+    spider.draw(time);
   });
 
   requestAnimationFrame(drawRainWithSpiders);
