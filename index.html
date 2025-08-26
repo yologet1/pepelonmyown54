@@ -404,7 +404,7 @@
 </head>
 
 <body>
-
+<canvas id="spiderCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; pointer-events: none;"></canvas>
 <div class="preloader" id="preloader">
   <h1>Добро пожаловать</h1>
   <button id="continue-button">Продолжить</button>
@@ -686,6 +686,29 @@
 
   // Initialize
   updateMusicInfo();
+
+const canvas = document.getElementById('spiderCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const spiders = many(2, spawn);
+
+addEventListener("pointermove", (e) => {
+  spiders.forEach(spider => {
+    spider.follow(e.clientX, e.clientY);
+  });
+});
+
+requestAnimationFrame(function anim(t) {
+  if (canvas.width !== innerWidth) canvas.width = innerWidth;
+  if (canvas.height !== innerHeight) canvas.height = innerHeight;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  spiders.forEach(spider => spider.tick(t));
+  requestAnimationFrame(anim);
+});
 </script>
 
 </body>
