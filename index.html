@@ -694,7 +694,7 @@ class Spider {
         this.color = color;
         this.legs = 8;
         this.speed = 1.2;
-        this.legLength = 30;
+        this.legLength = 10;
         this.targetX = this.x;
         this.targetY = this.y;
     }
@@ -757,7 +757,7 @@ class Spider {
             ctxRain.beginPath();
             ctxRain.moveTo(startX, startY);
 
-            const segments = 10;
+            const segments = 1;
             const segLength = this.legLength / segments;
 
             for (let s = 0; s < segments; s++) {
