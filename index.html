@@ -762,7 +762,7 @@ class Spider {
 
             for (let s = 0; s < segments; s++) {
                 // Каждая «молния» сильнее дребезжит
-                const wave = (Math.random() - 0.5) * 20; 
+                const wave = (Math.random() - 0.5) * 5; 
                 const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI/2) * wave;
                 const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI/2) * wave;
                 ctxRain.lineTo(endX, endY);
