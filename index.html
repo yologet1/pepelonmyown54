@@ -687,130 +687,115 @@
   // Initialize
   updateMusicInfo();
 
+// === ПАУКИ ===
 class Spider {
-    constructor(color) {
-        this.x = Math.random() * rainCanvas.width;
-        this.y = Math.random() * rainCanvas.height;
-        this.color = color;
-        this.legs = 8;
-        this.speed = 1.2;
-        this.legLength = 10;
-        this.targetX = this.x;
-        this.targetY = this.y;
-    }
+  constructor(color) {
+    this.x = Math.random() * rainCanvas.width;
+    this.y = Math.random() * rainCanvas.height;
+    this.color = color;
+    this.legs = 8;
+    this.speed = 1.5;      // скорость
+    this.legLength = 30;   // длина лапок
+    this.targetX = this.x;
+    this.targetY = this.y;
+  }
 
-    // Двигаемся к цели плавно
-    update() {
-        const dx = this.targetX - this.x;
-        const dy = this.targetY - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist > 1) {
-            this.x += (dx / dist) * this.speed;
-            this.y += (dy / dist) * this.speed;
-        }
+  follow(x, y) {
+    const dx = x - this.x;
+    const dy = y - this.y;
+    const dist = Math.hypot(dx, dy);
+    const comfort = 80;
+    if (dist > comfort) {
+      this.targetX = x - (dx / dist) * comfort;
+      this.targetY = y - (dy / dist) * comfort;
     }
+  }
 
-    // Случайное свободное движение, если нет курсора
-    wander() {
-        this.targetX += (Math.random() - 0.5) * 2;
-        this.targetY += (Math.random() - 0.5) * 2;
-        this.targetX = Math.max(0, Math.min(rainCanvas.width, this.targetX));
-        this.targetY = Math.max(0, Math.min(rainCanvas.height, this.targetY));
+  avoid(otherSpider) {
+    const dx = otherSpider.x - this.x;
+    const dy = otherSpider.y - this.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 80) {
+      this.x -= dx * 0.03;
+      this.y -= dy * 0.03;
     }
+  }
 
-    follow(x, y) {
-        this.targetX = x;
-        this.targetY = y;
+  getNearestDrops(count = this.legs) {
+    return [...drops]
+      .map(drop => ({ drop, dist: Math.hypot(this.x - drop.x, this.y - drop.y) }))
+      .sort((a,b)=>a.dist-b.dist)
+      .slice(0, count)
+      .map(d=>d.drop);
+  }
+
+  update() {
+    const dx = this.targetX - this.x;
+    const dy = this.targetY - this.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 1) {
+      this.x += (dx / dist) * this.speed;
+      this.y += (dy / dist) * this.speed;
     }
+  }
 
-    avoid(other) {
-        const dx = other.x - this.x;
-        const dy = other.y - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < 50) {
-            this.x -= dx * 0.05;
-            this.y -= dy * 0.05;
-        }
-    }
-
-    getNearestDrops(count = this.legs) {
-        return [...drops]
-            .map(d => ({ drop: d, dist: Math.hypot(this.x - d.x, this.y - d.y) }))
-            .sort((a, b) => a.dist - b.dist)
-            .slice(0, count)
-            .map(d => d.drop);
-    }
-
-    draw() {
+  draw() {
     ctxRain.strokeStyle = this.color;
-    ctxRain.lineWidth = 1.6;
-
+    ctxRain.lineWidth = 1.5;
     const nearest = this.getNearestDrops(this.legs);
 
     nearest.forEach(drop => {
-        let startX = this.x;
-        let startY = this.y;
-        const dx = drop.x - this.x;
-        const dy = drop.y - this.y;
-        const angle = Math.atan2(dy, dx);
+      let startX = this.x;
+      let startY = this.y;
+      const dx = drop.x - this.x;
+      const dy = drop.y - this.y;
+      const angle = Math.atan2(dy, dx);
+      ctxRain.beginPath();
+      ctxRain.moveTo(startX, startY);
 
-        ctxRain.beginPath();
-        ctxRain.moveTo(startX, startY);
+      const segments = 10; // 10 «молний» на лапку
+      const segLength = this.legLength / segments;
 
-        const segments = 1;
-        const segLength = this.legLength / segments;
-
-        for (let s = 0; s < segments; s++) {
-            // Сильное дрожание по всей длине
-            const wave = (Math.random() - 0.5) * 20; 
-            const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI/2) * wave;
-            const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI/2) * wave;
-
-            ctxRain.lineTo(endX, endY);
-
-            // следующая точка начинается с конца предыдущей
-            startX = endX;
-            startY = endY;
-        }
-
-        // Соединяем лапку с каплей
-        ctxRain.lineTo(drop.x, drop.y);
-        ctxRain.stroke();
+      for(let s=0;s<segments;s++){
+        const zigzag = (Math.random()-0.5)*15; // дрожание
+        const endX = startX + Math.cos(angle)*segLength + Math.cos(angle+Math.PI/2)*zigzag;
+        const endY = startY + Math.sin(angle)*segLength + Math.sin(angle+Math.PI/2)*zigzag;
+        ctxRain.lineTo(endX, endY);
+        startX = endX;
+        startY = endY;
+      }
+      ctxRain.lineTo(drop.x, drop.y);
+      ctxRain.stroke();
     });
+  }
 }
 
-// Создаём пауков
+// === СОЗДАЁМ ПАУКОВ ===
 const spiders = [new Spider("#fff"), new Spider("#fff")];
-let spiderMouseX = null;
-let spiderMouseY = null;
+let spiderMouseX = rainCanvas.width/2;
+let spiderMouseY = rainCanvas.height/2;
 
 window.addEventListener("mousemove", e => {
-    spiderMouseX = e.clientX;
-    spiderMouseY = e.clientY;
+  spiderMouseX = e.clientX;
+  spiderMouseY = e.clientY;
+  spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
 });
 
-// Анимация пауков
+// === АНИМАЦИЯ ПАУКОВ ===
 function drawSpiders() {
-    spiders.forEach((spider, i) => {
-        if (spiderMouseX !== null && spiderMouseY !== null) {
-            spider.follow(spiderMouseX, spiderMouseY);
-        } else {
-            spider.wander(); // если курсора нет, свободное движение
-        }
-
-        // Избегаем друг друга
-        for (let j = 0; j < spiders.length; j++) {
-            if (i !== j) spider.avoid(spiders[j]);
-        }
-
-        spider.update();
-        spider.draw();
-    });
-
-    requestAnimationFrame(drawSpiders);
+  spiders.forEach(s1 => spiders.forEach(s2 => { if(s1!==s2)s1.avoid(s2) }));
+  spiders.forEach(spider => {
+    // если курсор вне экрана, паук двигается к случайной точке
+    if(mouseX < 0 || mouseX>window.innerWidth || mouseY<0 || mouseY>window.innerHeight){
+      spider.follow(Math.random()*rainCanvas.width, Math.random()*rainCanvas.height);
+    }
+    spider.update();
+    spider.draw();
+  });
+  requestAnimationFrame(drawSpiders);
 }
-
 requestAnimationFrame(drawSpiders);
+
 </script>
 
 </body>
