@@ -740,40 +740,40 @@ class Spider {
             .map(d => d.drop);
     }
 
-    draw() {
-        ctxRain.strokeStyle = this.color;
-        ctxRain.lineWidth = 1.6;
+    draw(time) {
+    ctxRain.strokeStyle = this.color;
+    ctxRain.lineWidth = 1.6;
 
-        const nearest = this.getNearestDrops(this.legs);
+    const nearest = this.getNearestDrops(this.legs);
 
-        nearest.forEach(drop => {
-            let startX = this.x;
-            let startY = this.y;
-            const dx = drop.x - this.x;
-            const dy = drop.y - this.y;
-            const angle = Math.atan2(dy, dx);
+    nearest.forEach((drop, i) => {
+        let startX = this.x;
+        let startY = this.y;
+        const dx = drop.x - this.x;
+        const dy = drop.y - this.y;
+        const angle = Math.atan2(dy, dx);
 
-            ctxRain.beginPath();
-            ctxRain.moveTo(startX, startY);
+        ctxRain.beginPath();
+        ctxRain.moveTo(startX, startY);
 
-            const segments = 1; // количество молний на лапку
-            const segLength = this.legLength / segments;
+        const segments = 10; // количество сегментов-молний
+        const segLength = this.legLength / segments;
 
-            for (let s = 0; s < segments; s++) {
-                const zigzag = (Math.random() - 0.5) * 15;
-                const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * zigzag;
-                const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * zigzag;
-                ctxRain.lineTo(endX, endY);
-                startX = endX;
-                startY = endY;
-            }
+        for (let s = 0; s < segments; s++) {
+            // Синусоидальное дрожание вдоль перпендикуляра
+            const wave = Math.sin((time * 0.01) + s * 0.5 + i) * 8; 
+            const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * wave;
+            const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * wave;
 
-            ctxRain.lineTo(drop.x, drop.y);
-            ctxRain.stroke();
-        });
-    }
+            ctxRain.lineTo(endX, endY);
+            startX = endX;
+            startY = endY;
+        }
+
+        ctxRain.lineTo(drop.x, drop.y);
+        ctxRain.stroke();
+    });
 }
-
 // === СОЗДАЁМ ПАУКОВ ===
 const spiders = [new Spider("#fff"), new Spider("#fff")];
 
