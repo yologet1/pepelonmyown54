@@ -745,7 +745,7 @@ class Spider {
     }
   }
 
- draw(time) {
+  draw(time) {
     ctxRain.strokeStyle = this.color;
     ctxRain.lineWidth = 1.6;
 
@@ -780,6 +780,7 @@ class Spider {
         ctxRain.stroke();
     });
 }
+
 
 // === СОЗДАЁМ ДВУХ ПАУКОВ ===
 const spiders = [new Spider("#fff"), new Spider("#fff")];
@@ -816,12 +817,10 @@ function drawRainWithSpiders(time) {
     spider.draw(time);
   });
 
-  requestAnimationFrame(drawRainWithSpiders); // <-- правильно
+  requestAnimationFrame(drawRainWithSpiders);
 }
 
-// Запускаем анимацию через requestAnimationFrame
-requestAnimationFrame(drawRainWithSpiders);
-  
+drawRainWithSpiders();
 </script>
 
 </body>
