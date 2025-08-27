@@ -687,18 +687,25 @@
   // Initialize
   updateMusicInfo();
 
-// === ПАУКИ ===
 class Spider {
   constructor(color) {
     this.x = Math.random() * rainCanvas.width;
     this.y = Math.random() * rainCanvas.height;
     this.color = color;
-    this.legs = 8;         // количество лапок
-    this.segments = 1;     // сегменты лапки (ломаная линия)
-    this.speed = 1.5;      // скорость движения паука
-    this.legLength = 30;   // длина лапки
+    this.legs = 8;
+    this.segments = 1;
+    this.speed = 1.5;
+    this.legLength = 30;
     this.targetX = this.x;
     this.targetY = this.y;
+
+    this.changeTargetInterval = 200 + Math.random() * 300; // время до смены цели
+    this.timeSinceLastTarget = 0;
+  }
+
+  setRandomTarget() {
+    this.targetX = Math.random() * rainCanvas.width;
+    this.targetY = Math.random() * rainCanvas.height;
   }
 
   follow(x, y) {
@@ -725,16 +732,20 @@ class Spider {
 
   getNearestDrops(count = this.legs) {
     return [...drops]
-      .map(drop => ({
-        drop,
-        dist: Math.hypot(this.x - drop.x, this.y - drop.y)
-      }))
+      .map(drop => ({ drop, dist: Math.hypot(this.x - drop.x, this.y - drop.y) }))
       .sort((a, b) => a.dist - b.dist)
       .slice(0, count)
       .map(d => d.drop);
   }
 
-  update() {
+  update(deltaTime) {
+    // Периодически меняем случайную цель
+    this.timeSinceLastTarget += deltaTime;
+    if (this.timeSinceLastTarget > this.changeTargetInterval) {
+      this.setRandomTarget();
+      this.timeSinceLastTarget = 0;
+    }
+
     const dx = this.targetX - this.x;
     const dy = this.targetY - this.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -748,11 +759,8 @@ class Spider {
   draw(time) {
     ctxRain.strokeStyle = this.color;
     ctxRain.lineWidth = 1.6;
-
-    // Берём ближайшие капли
     const nearest = this.getNearestDrops(this.legs);
 
-    // Каждая лапка цепляется за каплю
     nearest.forEach((drop, i) => {
       let startX = this.x;
       let startY = this.y;
@@ -764,14 +772,10 @@ class Spider {
       ctxRain.moveTo(startX, startY);
 
       for (let s = 0; s < this.segments; s++) {
-        const segLength = (this.legLength / this.segments);
-
-        // Динамическое колебание лапки
+        const segLength = this.legLength / this.segments;
         const wave = Math.sin(time * 0.006 + i * 2 + s) * 8;
-
         const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * wave;
         const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * wave;
-
         ctxRain.lineTo(endX, endY);
         startX = endX;
         startY = endY;
@@ -783,22 +787,14 @@ class Spider {
   }
 }
 
-// === СОЗДАЁМ ДВУХ ПАУКОВ ===
-const spiders = [new Spider("#fff"), new Spider("#fff")];
-let spiderMouseX = rainCanvas.width / 2;
-let spiderMouseY = rainCanvas.height / 2;
-
-window.addEventListener("mousemove", (e) => {
-  spiderMouseX = e.clientX;
-  spiderMouseY = e.clientY;
-  spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
-});
-
 // === АНИМАЦИЯ ===
+let lastTime = 0;
 function drawRainWithSpiders(time) {
+  const deltaTime = time - lastTime;
+  lastTime = time;
+
   ctxRain.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
 
-  // Рисуем дождь
   for (let drop of drops) {
     drop.opacity = Math.max(0.1, Math.min(1, 1 - (drop.y / rainCanvas.height)));
     drop.y += drop.speedY;
@@ -809,12 +805,11 @@ function drawRainWithSpiders(time) {
     if (drop.y > rainCanvas.height) Object.assign(drop, createDrop());
   }
 
-  // Пауки двигаются и избегают друг друга
   spiders[0].avoid(spiders[1]);
   spiders[1].avoid(spiders[0]);
 
   spiders.forEach(spider => {
-    spider.update();
+    spider.update(deltaTime);
     spider.draw(time);
   });
 
@@ -822,6 +817,7 @@ function drawRainWithSpiders(time) {
 }
 
 drawRainWithSpiders();
+
 </script>
 
 </body>
