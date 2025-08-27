@@ -688,6 +688,7 @@
   updateMusicInfo();
 
 // === ПАУКИ ===
+// === ПАУКИ ===
 class Spider {
     constructor(color) {
         this.x = Math.random() * rainCanvas.width;
@@ -695,20 +696,30 @@ class Spider {
         this.color = color;
         this.legs = 8;        
         this.speed = 1.5;     
-        this.legLength = 30;  // короче лапки
+        this.legLength = 30;  
         this.targetX = this.x;
         this.targetY = this.y;
+        this.changeTargetTime = Date.now() + Math.random() * 3000 + 1000; // когда сменить цель
     }
 
-    follow(x, y) {
-        const dx = x - this.x;
-        const dy = y - this.y;
+    // Следуем к цели
+    followTarget() {
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
         const dist = Math.hypot(dx, dy);
-        const comfort = 80;
-        if (dist > comfort) {
-            this.targetX = x - (dx / dist) * comfort;
-            this.targetY = y - (dy / dist) * comfort;
+
+        if (dist > 1) {
+            this.x += (dx / dist) * this.speed;
+            this.y += (dy / dist) * this.speed;
+        } else if (Date.now() > this.changeTargetTime) {
+            this.setRandomTarget();
         }
+    }
+
+    setRandomTarget() {
+        this.targetX = Math.random() * rainCanvas.width;
+        this.targetY = Math.random() * rainCanvas.height;
+        this.changeTargetTime = Date.now() + Math.random() * 3000 + 1000; // новая цель через 1-4 секунды
     }
 
     avoid(otherSpider) {
@@ -729,16 +740,6 @@ class Spider {
             .map(d => d.drop);
     }
 
-    update() {
-        const dx = this.targetX - this.x;
-        const dy = this.targetY - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist > 1) {
-            this.x += (dx / dist) * this.speed;
-            this.y += (dy / dist) * this.speed;
-        }
-    }
-
     draw() {
         ctxRain.strokeStyle = this.color;
         ctxRain.lineWidth = 1.6;
@@ -755,8 +756,8 @@ class Spider {
             ctxRain.beginPath();
             ctxRain.moveTo(startX, startY);
 
-            const segments = 1; // увеличиваем количество «молний»
-            const segLength = this.legLength / segments; // лапки короче
+            const segments = 1; // количество молний на лапку
+            const segLength = this.legLength / segments;
 
             for (let s = 0; s < segments; s++) {
                 const zigzag = (Math.random() - 0.5) * 15;
@@ -775,27 +776,19 @@ class Spider {
 
 // === СОЗДАЁМ ПАУКОВ ===
 const spiders = [new Spider("#fff"), new Spider("#fff")];
-let spiderMouseX = rainCanvas.width / 2;
-let spiderMouseY = rainCanvas.height / 2;
-
-window.addEventListener("mousemove", (e) => {
-    spiderMouseX = e.clientX;
-    spiderMouseY = e.clientY;
-    spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
-});
 
 // === АНИМАЦИЯ ПАУКОВ ===
 function drawSpiders() {
     spiders[0].avoid(spiders[1]);
     spiders[1].avoid(spiders[0]);
     spiders.forEach(spider => {
-        spider.update();
+        spider.followTarget(); // теперь двигаются сами
         spider.draw();
     });
     requestAnimationFrame(drawSpiders);
 }
 
-// Запускаем анимацию пауков отдельно
+// Запускаем анимацию пауков
 requestAnimationFrame(drawSpiders);
 </script>
 
