@@ -767,7 +767,7 @@ class Spider {
 
       for (let s = 0; s < this.segments; s++) {
         const segLength = this.legLength / this.segments;
-        const wave = Math.sin(time * 0.006 + i * 2 + s) * 8;
+        const wave = Math.sin(time * 0.006 + i * 2 + s) * 1;
 
         const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * wave;
         const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * wave;
