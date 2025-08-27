@@ -695,7 +695,7 @@ class Spider {
         this.color = color;
         this.legs = 8;        
         this.speed = 2.2;     
-        this.legLength = 60;  
+        this.legLength = 40;  // короче лапки
         this.targetX = this.x;
         this.targetY = this.y;
     }
@@ -755,8 +755,8 @@ class Spider {
             ctxRain.beginPath();
             ctxRain.moveTo(startX, startY);
 
-            const segments = 10; // 10 «молний» на лапку
-            const segLength = this.legLength / segments * 0.5;
+            const segments = 15; // увеличиваем количество «молний»
+            const segLength = this.legLength / segments; // лапки короче
 
             for (let s = 0; s < segments; s++) {
                 const zigzag = (Math.random() - 0.5) * 15;
