@@ -753,11 +753,11 @@ class Spider {
       ctxRain.beginPath();
       ctxRain.moveTo(startX, startY);
 
-      const segments = 10; // 10 «молний» на лапку
+      const segments = 1; // 10 «молний» на лапку
       const segLength = this.legLength / segments;
 
       for(let s=0;s<segments;s++){
-        const zigzag = (Math.random()-0.5)*15; // дрожание
+        const zigzag = (Math.random()-0.5)*10; // дрожание
         const endX = startX + Math.cos(angle)*segLength + Math.cos(angle+Math.PI/2)*zigzag;
         const endY = startY + Math.sin(angle)*segLength + Math.sin(angle+Math.PI/2)*zigzag;
         ctxRain.lineTo(endX, endY);
