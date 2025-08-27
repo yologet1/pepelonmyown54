@@ -687,37 +687,29 @@
   // Initialize
   updateMusicInfo();
 
-// === ПАУКИ ===
 class Spider {
   constructor(color) {
     this.x = Math.random() * rainCanvas.width;
     this.y = Math.random() * rainCanvas.height;
     this.color = color;
     this.legs = 8;
-    this.speed = 1.5;      // скорость
-    this.legLength = 30;   // длина лапок
-    this.targetX = this.x;
-    this.targetY = this.y;
+    this.speed = 1.5;
+    this.legLength = 30;
+    this.targetX = Math.random() * rainCanvas.width;
+    this.targetY = Math.random() * rainCanvas.height;
+    this.legPoints = []; // для хранения точек каждой лапки
   }
 
-  follow(x, y) {
-    const dx = x - this.x;
-    const dy = y - this.y;
+  update() {
+    const dx = this.targetX - this.x;
+    const dy = this.targetY - this.y;
     const dist = Math.hypot(dx, dy);
-    const comfort = 80;
-    if (dist > comfort) {
-      this.targetX = x - (dx / dist) * comfort;
-      this.targetY = y - (dy / dist) * comfort;
-    }
-  }
-
-  avoid(otherSpider) {
-    const dx = otherSpider.x - this.x;
-    const dy = otherSpider.y - this.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist < 80) {
-      this.x -= dx * 0.03;
-      this.y -= dy * 0.03;
+    if (dist > 1) {
+      this.x += (dx / dist) * this.speed;
+      this.y += (dy / dist) * this.speed;
+    } else {
+      this.targetX = Math.random() * rainCanvas.width;
+      this.targetY = Math.random() * rainCanvas.height;
     }
   }
 
@@ -729,41 +721,39 @@ class Spider {
       .map(d=>d.drop);
   }
 
-  update() {
-    const dx = this.targetX - this.x;
-    const dy = this.targetY - this.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist > 1) {
-      this.x += (dx / dist) * this.speed;
-      this.y += (dy / dist) * this.speed;
-    }
-  }
-
   draw() {
     ctxRain.strokeStyle = this.color;
     ctxRain.lineWidth = 1.5;
+
     const nearest = this.getNearestDrops(this.legs);
 
-    nearest.forEach(drop => {
-      let startX = this.x;
-      let startY = this.y;
+    nearest.forEach((drop, i) => {
+      // создаём массив точек для каждой лапки, если его ещё нет
+      if (!this.legPoints[i]) {
+        this.legPoints[i] = [];
+        for(let s=0; s<10; s++){
+          this.legPoints[i].push({x:this.x, y:this.y});
+        }
+      }
+
+      const points = this.legPoints[i];
       const dx = drop.x - this.x;
       const dy = drop.y - this.y;
       const angle = Math.atan2(dy, dx);
-      ctxRain.beginPath();
-      ctxRain.moveTo(startX, startY);
 
-      const segments = 1; // 10 «молний» на лапку
-      const segLength = this.legLength / segments;
+      // сдвигаем каждую точку к следующей с плавностью
+      points[0].x += (this.x - points[0].x) * 0.2;
+      points[0].y += (this.y - points[0].y) * 0.2;
 
-      for(let s=0;s<segments;s++){
-        const zigzag = (Math.random()-0.5)*10; // дрожание
-        const endX = startX + Math.cos(angle)*segLength + Math.cos(angle+Math.PI/2)*zigzag;
-        const endY = startY + Math.sin(angle)*segLength + Math.sin(angle+Math.PI/2)*zigzag;
-        ctxRain.lineTo(endX, endY);
-        startX = endX;
-        startY = endY;
+      for (let j=1; j<points.length; j++) {
+        points[j].x += (points[j-1].x + Math.cos(angle)*(this.legLength/points.length) - points[j].x)*0.3;
+        points[j].y += (points[j-1].y + Math.sin(angle)*(this.legLength/points.length) - points[j].y)*0.3;
       }
+
+      // линия от паука через точки к капле
+      ctxRain.beginPath();
+      ctxRain.moveTo(this.x, this.y);
+      points.forEach(p=>ctxRain.lineTo(p.x, p.y));
       ctxRain.lineTo(drop.x, drop.y);
       ctxRain.stroke();
     });
@@ -771,31 +761,17 @@ class Spider {
 }
 
 // === СОЗДАЁМ ПАУКОВ ===
-const spiders = [new Spider("#fff"), new Spider("#fff")];
-let spiderMouseX = rainCanvas.width/2;
-let spiderMouseY = rainCanvas.height/2;
-
-window.addEventListener("mousemove", e => {
-  spiderMouseX = e.clientX;
-  spiderMouseY = e.clientY;
-  spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
-});
+const spiders = [new Spider("#fff"), new Spider("#fff"), new Spider("#fff")];
 
 // === АНИМАЦИЯ ПАУКОВ ===
 function drawSpiders() {
-  spiders.forEach(s1 => spiders.forEach(s2 => { if(s1!==s2)s1.avoid(s2) }));
   spiders.forEach(spider => {
-    // если курсор вне экрана, паук двигается к случайной точке
-    if(mouseX < 0 || mouseX>window.innerWidth || mouseY<0 || mouseY>window.innerHeight){
-      spider.follow(Math.random()*rainCanvas.width, Math.random()*rainCanvas.height);
-    }
     spider.update();
     spider.draw();
   });
   requestAnimationFrame(drawSpiders);
 }
 requestAnimationFrame(drawSpiders);
-
 </script>
 
 </body>
