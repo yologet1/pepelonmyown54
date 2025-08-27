@@ -687,55 +687,20 @@
   // Initialize
   updateMusicInfo();
 
-// === Пауки ===
 class Spider {
     constructor(color) {
         this.x = Math.random() * rainCanvas.width;
         this.y = Math.random() * rainCanvas.height;
         this.color = color;
-        this.legs = 8;        
-        this.speed = 1.5;     
-        this.legLength = 30;  // длина лапки
+        this.legs = 8;
+        this.speed = 1.2;
+        this.legLength = 30;
         this.targetX = this.x;
         this.targetY = this.y;
     }
 
-    follow(x, y) {
-        const dx = x - this.x;
-        const dy = y - this.y;
-        const dist = Math.hypot(dx, dy);
-        const comfort = 80;
-        if (dist > comfort) {
-            this.targetX = x - (dx / dist) * comfort;
-            this.targetY = y - (dy / dist) * comfort;
-        }
-    }
-
-    avoid(otherSpider) {
-        const dx = otherSpider.x - this.x;
-        const dy = otherSpider.y - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < 80) {
-            this.x -= dx * 0.03;
-            this.y -= dy * 0.03;
-        }
-    }
-
-    getNearestDrops(count = this.legs) {
-        return [...drops]
-            .map(drop => ({ drop, dist: Math.hypot(this.x - drop.x, this.y - drop.y) }))
-            .sort((a, b) => a.dist - b.dist)
-            .slice(0, count)
-            .map(d => d.drop);
-    }
-
+    // Двигаемся к цели плавно
     update() {
-        // Свободное движение, если курсор вне экрана
-        if (typeof spiderMouseX === 'undefined') {
-            this.targetX += (Math.random() - 0.5) * 10;
-            this.targetY += (Math.random() - 0.5) * 10;
-        }
-
         const dx = this.targetX - this.x;
         const dy = this.targetY - this.y;
         const dist = Math.hypot(dx, dy);
@@ -745,13 +710,44 @@ class Spider {
         }
     }
 
-    draw(time) {
+    // Случайное свободное движение, если нет курсора
+    wander() {
+        this.targetX += (Math.random() - 0.5) * 2;
+        this.targetY += (Math.random() - 0.5) * 2;
+        this.targetX = Math.max(0, Math.min(rainCanvas.width, this.targetX));
+        this.targetY = Math.max(0, Math.min(rainCanvas.height, this.targetY));
+    }
+
+    follow(x, y) {
+        this.targetX = x;
+        this.targetY = y;
+    }
+
+    avoid(other) {
+        const dx = other.x - this.x;
+        const dy = other.y - this.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 50) {
+            this.x -= dx * 0.05;
+            this.y -= dy * 0.05;
+        }
+    }
+
+    getNearestDrops(count = this.legs) {
+        return [...drops]
+            .map(d => ({ drop: d, dist: Math.hypot(this.x - d.x, this.y - d.y) }))
+            .sort((a, b) => a.dist - b.dist)
+            .slice(0, count)
+            .map(d => d.drop);
+    }
+
+    draw() {
         ctxRain.strokeStyle = this.color;
         ctxRain.lineWidth = 1.6;
 
         const nearest = this.getNearestDrops(this.legs);
 
-        nearest.forEach((drop, i) => {
+        nearest.forEach(drop => {
             let startX = this.x;
             let startY = this.y;
             const dx = drop.x - this.x;
@@ -761,47 +757,57 @@ class Spider {
             ctxRain.beginPath();
             ctxRain.moveTo(startX, startY);
 
-            const segments = 1; // количество сегментов на лапку
+            const segments = 10;
             const segLength = this.legLength / segments;
 
             for (let s = 0; s < segments; s++) {
-                // Эффект дрожания как звуковая волна
-                const wave = (Math.random() - 0.5) * 30; 
-                const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI / 2) * wave;
-                const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI / 2) * wave;
+                // Каждая «молния» сильнее дребезжит
+                const wave = (Math.random() - 0.5) * 20; 
+                const endX = startX + Math.cos(angle) * segLength + Math.cos(angle + Math.PI/2) * wave;
+                const endY = startY + Math.sin(angle) * segLength + Math.sin(angle + Math.PI/2) * wave;
                 ctxRain.lineTo(endX, endY);
                 startX = endX;
                 startY = endY;
             }
 
+            // Тянем лапку к капле
             ctxRain.lineTo(drop.x, drop.y);
             ctxRain.stroke();
         });
     }
 }
 
-// === Создаём пауков ===
+// Создаём пауков
 const spiders = [new Spider("#fff"), new Spider("#fff")];
-let spiderMouseX, spiderMouseY;
+let spiderMouseX = null;
+let spiderMouseY = null;
 
-window.addEventListener("mousemove", (e) => {
+window.addEventListener("mousemove", e => {
     spiderMouseX = e.clientX;
     spiderMouseY = e.clientY;
-    spiders.forEach(spider => spider.follow(spiderMouseX, spiderMouseY));
 });
 
-// === Анимация пауков ===
+// Анимация пауков
 function drawSpiders() {
-    spiders[0].avoid(spiders[1]);
-    spiders[1].avoid(spiders[0]);
-    spiders.forEach(spider => {
+    spiders.forEach((spider, i) => {
+        if (spiderMouseX !== null && spiderMouseY !== null) {
+            spider.follow(spiderMouseX, spiderMouseY);
+        } else {
+            spider.wander(); // если курсора нет, свободное движение
+        }
+
+        // Избегаем друг друга
+        for (let j = 0; j < spiders.length; j++) {
+            if (i !== j) spider.avoid(spiders[j]);
+        }
+
         spider.update();
         spider.draw();
     });
+
     requestAnimationFrame(drawSpiders);
 }
 
-// Запуск анимации пауков поверх дождя
 requestAnimationFrame(drawSpiders);
 </script>
 
